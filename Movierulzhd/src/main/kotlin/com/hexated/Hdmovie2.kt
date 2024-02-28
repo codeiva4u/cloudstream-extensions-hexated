@@ -2,7 +2,6 @@ package com.hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.apmap
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mainPageOf
@@ -13,28 +12,21 @@ import org.jsoup.Jsoup
 
 class Hdmovie2 : Movierulzhd() {
 
-    override var mainUrl = "https://multimovies.uno"
+    override var mainUrl = "https://hdmovie2.tax"
     override var name = "Hdmovie2"
-    override val hasMainPage = true
-    override var lang = "hi"
-    override val hasQuickSearch = true
-    override val hasDownloadSupport = true
-    override val supportedTypes = setOf(
-        TvType.Movie,
-        TvType.TvSeries
-    )
     override val mainPage = mainPageOf(
-        "$mainUrl/category/bollywood-1080p/" to "Bollywood Movies",
-        "$mainUrl/category/hindi-dubbed/" to "Hindi Dubbed Movies",
-        "$mainUrl/south-hindi-dubbed-720p/" to "South Dubbed Movies",
-        "$mainUrl/category/web-series/" to "Hindi Web Series",
-        "$mainUrl/category/netflix/" to "NetFlix",
-        "$mainUrl/category/amazon-prime-video/" to "Amazon Prime Videos",
-        "$mainUrl/category/disney-plus-hotstar/" to "HotStar",
-        "$mainUrl/category/zee5/" to "Zee5",
-        "$mainUrl/category/jio-cinema/" to "Jio Cinema",
-        "$mainUrl/category/sonyliv/" to "SonyLiv",
-        "$mainUrl/category/voot/" to "Voot",
+        "movies" to "New Release",
+        "genre/hindi-dubbed" to "Hindi Dubbed Movies",
+        "genre/hindi" to "Hindi Movies",
+        "genre/hindi-dubbed-web-series" to "Hindi Dubbed Web Series",
+        "hindi-web-series-download" to "Hindi Web Series",
+        "genre/netflix" to "Netflix",
+        "genre/amazon-prime" to "Amazon Prime",
+        "genre/hotstar" to "Hotstar",
+        "genre/Zee5" to "Zee5",
+        "genre/jio-cinema" to "Jio Cinema",
+        "genre/voot" to "Voot Original",
+        "genre/sony-liv" to "Sony LIV",
     )
 
     override suspend fun loadLinks(
