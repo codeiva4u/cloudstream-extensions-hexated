@@ -1,0 +1,82 @@
+[
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=movierulzhd.best&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 27060,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 16,
+        "internalName": "Movierulzhd",
+        "description": "Includes: Hdmovie2, Animesaga",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/Movierulzhd.cs3",
+        "name": "Movierulzhd"
+    },
+    {
+        "iconUrl": "https://github.com/codeiva4u/cloudstream-extensions-hindi/blob/master/MultiMoviesProvider/icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 19228,
+        "status": 0,
+        "language": "hi",
+        "authors": [
+            "hexated"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "MultiMoviesProvider",
+        "description": "Indian Multi-language HD Provider",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/MultiMoviesProvider.cs3",
+        "name": "MultiMoviesProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=prmovies.green&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 14032,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 3,
+        "internalName": "PrmoviesProvider",
+        "description": "Contains Bharatiya Movies & Webseries from Indian Film Industry and Dubbed Hollywood content, Max Resolution is 1080p",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/PrmoviesProvider.cs3",
+        "name": "PrmoviesProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=prmovies.green&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 15486,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 2,
+        "internalName": "YomoviesProvider",
+        "description": "Contains Bharatiya Movies & Webseries from Indian Film Industry and Dubbed Hollywood content, Max Resolution is 1080p",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/YomoviesProvider.cs3",
+        "name": "YomoviesProvider"
+    }
+]
