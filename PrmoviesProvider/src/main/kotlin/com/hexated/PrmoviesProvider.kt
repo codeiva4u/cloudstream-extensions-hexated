@@ -10,7 +10,7 @@ import org.jsoup.nodes.Element
 
 class PrmoviesProvider : MainAPI() {
 
-    override var mainUrl = "https://prmovies.dog"
+    override var mainUrl = "https://hdmovies4u.dev"
     override var name = "Prmovies"
     override val hasMainPage = true
     override var lang = "hi"
@@ -23,7 +23,7 @@ class PrmoviesProvider : MainAPI() {
 
     override val mainPage = mainPageOf(
         "$mainUrl/genre/top-rated/page/" to "New Release Movies",
-        "$mainUrl/genre/dual-audio/page/" to "Hindi Dubbed Movies",
+        "$mainUrl/category/south-hindi-dubbed-720p/" to "Hindi Dubbed Movies",
         "$mainUrl/genre/bollywood/page/" to "Bollywood Movies",
         "$mainUrl/genre/web-series/page/" to "Hindi Web Series",
         "$mainUrl/director/netflix/page/" to "NetFlix",
