@@ -25,7 +25,7 @@ open class Movierulzhd : MainAPI() {
     override val mainPage = mainPageOf(
         "movies" to "New Release",
         "genre/hindi-dubbed" to "Hindi Dubbed Movies",
-        "genre/hindi" to "Hindi Movies",
+        "category/south-hindi-dubbed-720p" to "Hindi Movies",
         "genre/hindi-dubbed-web-series" to "Hindi Dubbed Web Series",
         "hindi-web-series-download" to "Hindi Web Series",
         "genre/netflix" to "Netflix",
