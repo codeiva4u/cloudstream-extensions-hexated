@@ -23,7 +23,7 @@ class PrmoviesProvider : MainAPI() {
 
     override val mainPage = mainPageOf(
         "$mainUrl/genre/top-rated/page/" to "New Release Movies",
-        "genre/dual-audio/" to "Hindi Dubbed Movies",
+        "$mainUrl/genre/dual-audio/" to "Hindi Dubbed Movies",
         "$mainUrl/genre/bollywood/page/" to "Bollywood Movies",
         "$mainUrl/genre/web-series/page/" to "Hindi Web Series",
         "$mainUrl/director/netflix/page/" to "NetFlix",
