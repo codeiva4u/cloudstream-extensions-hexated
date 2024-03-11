@@ -12,17 +12,17 @@ import org.jsoup.Jsoup
 
 class Hdmovie2 : Movierulzhd() {
 
-    override var mainUrl = "https://hdmovie2.chat"
+    override var mainUrl = "https://hdmovie2.je"
     override var name = "Hdmovie2"
     override val mainPage = mainPageOf(
         "release/2024" to "New Release",
         "genre/hindi-dubbed" to "Hindi Dubbed Movies",
+        "genre/series" to "Web Series",
         "genre/bollywood" to "Hindi Movies",
         "genre/netflix" to "Netflix",
         "genre/amazon-prime" to "Amazon Prime",
         "genre/hotstar" to "Hotstar",
         "genre/zee5" to "Zee5",
-        "genre/jio-cinema" to "Jio Cinema",
         "genre/voot" to "Voot Original",
         "genre/sony-liv" to "Sony LIV",
     )
