@@ -15,7 +15,7 @@ class Hdmovie2 : Movierulzhd() {
     override var mainUrl = "https://hdmovie2.je"
     override var name = "Hdmovie2"
     override val mainPage = mainPageOf(
-        "release/2024" to "New Release",
+        "movies" to "New Release",
         "genre/hindi-dubbed" to "Hindi Dubbed Movies",
         "genre/series" to "Web Series",
         "genre/bollywood" to "Hindi Movies",
