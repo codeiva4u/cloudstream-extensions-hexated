@@ -10,7 +10,7 @@ import org.jsoup.nodes.Element
 
 open class YomoviesProvider : MainAPI() {
 
-    override var mainUrl = "https://yomovies.town"
+    override var mainUrl = "https://yomovies.stream"
     override var name = "Yomovies"
     override val hasMainPage = true
     override var lang = "hi"
