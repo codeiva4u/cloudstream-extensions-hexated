@@ -1,0 +1,100 @@
+[
+    {
+        "iconUrl": "https://www.freepnglogos.com/uploads/tv-png/tv-png-box-television-set-cable-screen-icon-31.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 11785,
+        "status": 1,
+        "authors": [
+            "HindiProviders,King,Lag,Rowdy"
+        ],
+        "tvTypes": [
+            "Live"
+        ],
+        "version": 26,
+        "internalName": "IndianTVProvider",
+        "description": "Indian TV",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/IndianTVProvider.cs3",
+        "name": "IndianTVProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=movierulzhd.green&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 25826,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "HindiProvider"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 13,
+        "internalName": "Movierulzhd",
+        "description": "Includes: Hdmovie2",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/Movierulzhd.cs3",
+        "name": "Movierulzhd"
+    },
+    {
+        "iconUrl": "https://raw.githubusercontent.com/LikDev-256/likdev256-tamil-providers/master/MultiMoviesProvider/icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 20494,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "HindiProviders"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Anime"
+        ],
+        "version": 11,
+        "internalName": "MultiMoviesProvider",
+        "description": "Indian Multi-language HD Provider",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/MultiMoviesProvider.cs3",
+        "name": "MultiMoviesProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=prmovies.bio&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 14211,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "PrmoviesProvider",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/PrmoviesProvider.cs3",
+        "name": "PrmoviesProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=yomovies.rest&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 15749,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 46,
+        "internalName": "YomoviesProvider",
+        "description": "Includes: Watchomovies(NS*W), Max resolution is 720p in both extensions.",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/YomoviesProvider.cs3",
+        "name": "YomoviesProvider"
+    }
+]
