@@ -13,13 +13,13 @@ class Banglaplex : MainAPI() {
     override val supportedTypes       = setOf(TvType.Movie)
 
     override val mainPage = mainPageOf(
-        "#hot" to "Trending",
+        "movi" to "New Release Movies",
         "genre/bollywood-movies" to "Bollywood",
         "genre/hollywood-movies" to "Hollywood",
         "genre/south-indian-movies" to "South Indian Movies",
+        "genre/dual-audio-movies" to "Dubbed Movies",
+        "genre//dual-audio-series" to "Dubbed Series",
         "genre/bollywood-series" to "Bollywood Series",
-        "genre/dual-audio-movies" to "Dual Audio Movies",
-        "genre/korean-web-series" to "Korean Web Series",
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
