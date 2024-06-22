@@ -9,7 +9,7 @@ import com.hexated.Vectorx
 @CloudstreamPlugin
 class BanglaPlexProvider: Plugin() {
     override fun load(context: Context) {
-        registerMainAPI(Banglaplex())
-        registerExtractorAPI(Vectorx())
+        // registerMainAPI(Banglaplex())
+        // registerExtractorAPI(Vectorx())
     }
 }
