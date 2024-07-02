@@ -2,6 +2,7 @@ package com.HindiProviders
 
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
 import com.lagradost.cloudstream3.extractors.VidhideExtractor
+import com.lagradost.cloudstream3.extractors.GMPlayer
 
 
 class Multimovies : StreamWishExtractor() {
@@ -23,3 +24,16 @@ class server2 : VidhideExtractor() {
     override var name = "Multimovies Vidhide"
     override var mainUrl = "https://server2.shop"
 }
+
+
+class Gogoanime : VidhideExtractor() {
+    override var name = "Gogoanime"
+    override var mainUrl = "https://gogoanime.website"
+}
+
+
+open class GMPlayer : GMPlayer() {
+    override var name = "GMPlayer"
+    override var mainUrl = "https://gogoanime.website"
+}
+
