@@ -26,7 +26,7 @@ class IndianTVProvider : MainAPI() {
 
     companion object {
         const val INDIANJIOAPI = "https://madstream.one/pages/jiotv.php"
-        const val INDIANTATAAPI = "https://gogoanime.website/"
+        const val INDIANTATAAPI = "https://gogoanime.website/pages/play.php"
 //        const val INDIANDiscoveryAPI = BuildConfig.INDIANTV_Discovery_API
 //        const val INDIANAirtelAPI = BuildConfig.INDIANTV_Airtel_API
 //        const val INDIANTVVootAPI = BuildConfig.INDIANTV_Voot_API
