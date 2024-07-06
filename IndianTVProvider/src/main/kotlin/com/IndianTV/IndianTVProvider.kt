@@ -26,7 +26,7 @@ class IndianTVProvider : MainAPI() {
 
     companion object {
         const val INDIANJIOAPI = "https://madstream.one/pages/jiotv.php"
-        const val INDIANTATAAPI = "https://gogoanime.website/pages/play.php"
+        const val INDIANTATAAPI = "https://madstream.one/pages/tataplay.php"
 //        const val INDIANDiscoveryAPI = BuildConfig.INDIANTV_Discovery_API
 //        const val INDIANAirtelAPI = BuildConfig.INDIANTV_Airtel_API
 //        const val INDIANTVVootAPI = BuildConfig.INDIANTV_Voot_API
@@ -183,27 +183,16 @@ class IndianTVProvider : MainAPI() {
         else
             if (data.contains("tata")) {
                 Log.d("Rhinoout", data)
-                val doc=app.get(data).text
-                val link=doc.substringAfter("file: \"").substringBefore("\"")
-                val newkeyId=doc.substringAfter("keyId\":\"").substringBefore("\"")
-                val newkey=doc.substringAfter("key\":\"").substringBefore("\"")
-                val finalkey = decodeHex(newkey)
-                val finalkeyid = decodeHex(newkeyId)
-                Log.d("Rhinoout link", link)
-                Log.d("Rhinoout newkeyId", newkeyId)
-                Log.d("Rhinoout newkeyId", finalkeyid)
-                Log.d("Rhinoout newkey", newkey)
-                Log.d("Rhinoout newkeyId", finalkey)
+                val channelID = data.substringAfter("=")
+                val link = "https://madplay.live/hls/tata/stream.php?id=$channelID&e=.m3u8"
                 callback.invoke(
-                    DrmExtractorLink(
+                    ExtractorLink(
                         source = "INDIAN TV",
                         name = "INDIAN TV",
                         url = link,
                         referer = "",
-                        quality = Qualities.P1080.value,
-                        type = INFER_TYPE,
-                        kid = finalkeyid,
-                        key = finalkey,
+                        quality = Qualities.Unknown.value,
+                        isM3u8 = true,
                     )
                 )
             }
