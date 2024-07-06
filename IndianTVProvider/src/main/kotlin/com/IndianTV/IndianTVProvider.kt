@@ -112,19 +112,18 @@ class IndianTVProvider : MainAPI() {
 
     // Define a nullable global variable to store globalArgument
 
-    @SuppressLint("SuspiciousIndentation")
-    override suspend fun loadLinks(
-        data: String,
-        isCasting: Boolean,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        //val document = app.get(data, headers = mapOf("User-Agent" to Useragent)).document
-        Log.d("Phisher",data)
-        if (data.contains("jiotv"))
-        {
-            val channelID=data.substringAfter("=")
-            val link="https://madplay.live/hls/jiotv/stream.php?id=$channelID&e=.m3u8"
+   @SuppressLint("SuspiciousIndentation")
+override suspend fun loadLinks(
+    data: String,
+    isCasting: Boolean,
+    subtitleCallback: (SubtitleFile) -> Unit,
+    callback: (ExtractorLink) -> Unit
+): Boolean {
+    Log.d("Phisher", data)
+    when {
+        data.contains("jiotv") -> {
+            val channelID = data.substringAfter("=")
+            val link = "https://madplay.live/hls/jiotv/stream.php?id=$channelID&e=.m3u8"
             callback.invoke(
                 ExtractorLink(
                     source = "INDIAN TV",
@@ -132,99 +131,37 @@ class IndianTVProvider : MainAPI() {
                     url = link,
                     referer = "",
                     quality = Qualities.Unknown.value,
-                    isM3u8 = true,
+                    isM3u8 = true
                 )
             )
         }
-        /*
-        if (data.contains("jiotv.php")) {
-            Log.d("Rhinoout", data)
-            val scripts = document.select("script")
-            var globalArgument: Any? = null
-
-            scripts.map { script ->
-                val finalScriptRaw = script.data().toString()
-                mainWork {
-                    if (finalScriptRaw.contains("split")) {
-                        val startJs =
-                            """
-                var globalArgument = null;
-                function jwplayer() {
-                    return {
-                        id: null,
-                        setup: function(arg) {
-                            globalArgument = arg;
-                        }
-                    };
-                };
-                """
-                        val rhino = getRhinoContext()
-                        val scope: Scriptable = rhino.initSafeStandardObjects()
-                        rhino.evaluateString(scope, startJs + finalScriptRaw, "JavaScript", 1, null)
-                        globalArgument = scope.get("globalArgument", scope)
-                    }
-                }
-
-                // Access globalArgument outside mainWork block
-                val rhinout = globalArgument?.toJson() ?: ""
-                val link = rhinout.substringAfter("file\":\"").substringBefore("\",")
-                callback.invoke(
-                    ExtractorLink(
-                        source = "INDIAN TV",
-                        name = "INDIAN TV",
-                        url = link,
-                        referer = "",
-                        quality = Qualities.Unknown.value,
-                        type = INFER_TYPE,
-                    )
+        data.contains("tata") -> {
+            val channelID = data.substringAfter("=").substringBefore("&")
+            val link = "https://madplay.live/hls/tata/stream.php?id=$channelID&e=.m3u8"
+            callback.invoke(
+                ExtractorLink(
+                    source = "INDIAN TV",
+                    name = "INDIAN TV",
+                    url = link,
+                    referer = "",
+                    quality = Qualities.Unknown.value,
+                    isM3u8 = true
                 )
-            }
-        } */
-        else
-            if (data.contains("tata")) {
-                Log.d("Rhinoout", data)
-                val channelID = data.substringAfter("=")
-                val link = "https://madplay.live/hls/tata/stream.php?id=$channelID&e=.m3u8"
-                callback.invoke(
-                    ExtractorLink(
-                        source = "INDIAN TV",
-                        name = "INDIAN TV",
-                        url = link,
-                        referer = "",
-                        quality = Qualities.Unknown.value,
-                        isM3u8 = true,
-                    )
-                )
-            }
-        else if (data.contains("jwplayer.php?"))
-            {
-                val link=data.substringAfter("jwplayer.php?")
-                callback.invoke(
-                    ExtractorLink(
-                        source = "INDIAN TV",
-                        name = "INDIAN TV",
-                        url = link,
-                        referer = "",
-                        quality = Qualities.Unknown.value,
-                        type = INFER_TYPE,
-                    )
-                )
-            }
-        return true
-    }
-
-
-    private fun decodeHex(hexString: String):String {
-        //hexStringToByteArray
-        val length = hexString.length
-        val byteArray = ByteArray(length / 2)
-
-        for (i in 0 until length step 2) {
-            byteArray[i / 2] = ((Character.digit(hexString[i], 16) shl 4) +
-                    Character.digit(hexString[i + 1], 16)).toByte()
+            )
         }
-        //byteArrayToBase64
-        val base64ByteArray = Base64.encode(byteArray, Base64.NO_PADDING)
-        return String(base64ByteArray, StandardCharsets.UTF_8).trim()
+        data.contains("jwplayer.php?") -> {
+            val link = data.substringAfter("jwplayer.php?")
+            callback.invoke(
+                ExtractorLink(
+                    source = "INDIAN TV",
+                    name = "INDIAN TV",
+                    url = link,
+                    referer = "",
+                    quality = Qualities.Unknown.value,
+                    type = INFER_TYPE
+                )
+            )
+        }
     }
+    return true
 }
