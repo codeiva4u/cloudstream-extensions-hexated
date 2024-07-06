@@ -101,7 +101,7 @@ class IndianTVProvider : MainAPI() {
         when {
             data.contains("jiotv") -> {
                 val channelID = data.substringAfter("play=")
-                val link = "https://madplay.live/hls/jiotv/?play=$channelID=.m3u8"
+                val link = "https://madplay.live/hls/jiotv/stream.php?id=$channelID&e=.m3u8"
                 callback.invoke(
                     ExtractorLink(
                         source = "INDIAN TV",
@@ -115,7 +115,7 @@ class IndianTVProvider : MainAPI() {
             }
             data.contains("tata") -> {
                 val channelID = data.substringAfter("id=").substringBefore("&")
-                val link = "https://madplay.live/hls/tata/play.php?id=$channelID=.m3u8"
+                val link = "https://madplay.live/hls/tata/stream.php?id=$channelID&e=.m3u8"
                 callback.invoke(
                     ExtractorLink(
                         source = "INDIAN TV",
