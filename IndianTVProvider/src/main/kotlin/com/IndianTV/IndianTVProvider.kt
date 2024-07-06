@@ -112,56 +112,59 @@ class IndianTVProvider : MainAPI() {
 
     // Define a nullable global variable to store globalArgument
 
-   @SuppressLint("SuspiciousIndentation")
-override suspend fun loadLinks(
-    data: String,
-    isCasting: Boolean,
-    subtitleCallback: (SubtitleFile) -> Unit,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
-    Log.d("Phisher", data)
-    when {
-        data.contains("jiotv") -> {
-            val channelID = data.substringAfter("=")
-            val link = "https://madplay.live/hls/jiotv/stream.php?id=$channelID&e=.m3u8"
-            callback.invoke(
-                ExtractorLink(
-                    source = "INDIAN TV",
-                    name = "INDIAN TV",
-                    url = link,
-                    referer = "",
-                    quality = Qualities.Unknown.value,
-                    isM3u8 = true
+  @SuppressLint("SuspiciousIndentation")
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        Log.d("Phisher", data)
+        when {
+            data.contains("jiotv") -> {
+                val channelID = data.substringAfter("=")
+                val link = "https://madplay.live/hls/jiotv/stream.php?id=$channelID&e=.m3u8"
+                callback.invoke(
+                    ExtractorLink(
+                        source = "INDIAN TV",
+                        name = "INDIAN TV",
+                        url = link,
+                        referer = "",
+                        quality = Qualities.Unknown.value,
+                        isM3u8 = true
+                    )
                 )
-            )
-        }
-        data.contains("tata") -> {
-            val channelID = data.substringAfter("=").substringBefore("&")
-            val link = "https://madplay.live/hls/tata/stream.php?id=$channelID&e=.m3u8"
-            callback.invoke(
-                ExtractorLink(
-                    source = "INDIAN TV",
-                    name = "INDIAN TV",
-                    url = link,
-                    referer = "",
-                    quality = Qualities.Unknown.value,
-                    isM3u8 = true
+            }
+
+            data.contains("tata") -> {
+                val channelID = data.substringAfter("id=").substringBefore("&")
+                val link = "https://madplay.live/hls/tata/play.php?id=$channelID"
+                callback.invoke(
+                    ExtractorLink(
+                        source = "INDIAN TV",
+                        name = "INDIAN TV",
+                        url = link,
+                        referer = "",
+                        quality = Qualities.Unknown.value,
+                        isM3u8 = true
+                    )
                 )
-            )
-        }
-        data.contains("jwplayer.php?") -> {
-            val link = data.substringAfter("jwplayer.php?")
-            callback.invoke(
-                ExtractorLink(
-                    source = "INDIAN TV",
-                    name = "INDIAN TV",
-                    url = link,
-                    referer = "",
-                    quality = Qualities.Unknown.value,
-                    type = INFER_TYPE
+            }
+
+            data.contains("jwplayer.php?") -> {
+                val link = data.substringAfter("jwplayer.php?")
+                callback.invoke(
+                    ExtractorLink(
+                        source = "INDIAN TV",
+                        name = "INDIAN TV",
+                        url = link,
+                        referer = "",
+                        quality = Qualities.Unknown.value,
+                        type = INFER_TYPE
+                    )
                 )
-            )
+            }
         }
+        return true
     }
-    return true
 }
