@@ -90,7 +90,7 @@ class IndianTVProvider : MainAPI() {
         }
     }
 
-    @SuppressLint("SuspiciousIndentation")
+   @SuppressLint("SuspiciousIndentation")
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -113,9 +113,11 @@ class IndianTVProvider : MainAPI() {
                     )
                 )
             }
+
             data.contains("tata") -> {
                 val channelID = data.substringAfter("id=").substringBefore("&")
-                val link = "https://bpprod7catchup.akamaized.net/bpk-tv/irdeto_com_Channel_$channelID/output/dash/stream.m3u8"
+                val link =
+                    "https://bpprod7catchup.akamaized.net/bpk-tv/irdeto_com_Channel_$channelID/output/dash/stream.m3u8"
                 callback.invoke(
                     ExtractorLink(
                         source = "INDIAN TV",
@@ -127,6 +129,7 @@ class IndianTVProvider : MainAPI() {
                     )
                 )
             }
+
             data.contains("jwplayer.php?") -> {
                 val link = data.substringAfter("jwplayer.php?")
                 callback.invoke(
