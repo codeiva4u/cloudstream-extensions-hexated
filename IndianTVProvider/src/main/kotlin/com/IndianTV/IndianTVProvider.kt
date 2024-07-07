@@ -90,7 +90,7 @@ class IndianTVProvider : MainAPI() {
         }
     }
 
-   @SuppressLint("SuspiciousIndentation")
+  @SuppressLint("SuspiciousIndentation")
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -116,8 +116,7 @@ class IndianTVProvider : MainAPI() {
 
             data.contains("tata") -> {
                 val channelID = data.substringAfter("id=").substringBefore("&")
-                val link =
-                    "http://bpprod7catchup.akamaized.net/bpk-tv/irdeto_com_Channel_$channelID/output/manifest.mpd?"
+                val link = "http://bpprod7catchup.akamaized.net/bpk-tv/irdeto_com_Channel_$channelID/output/manifest.mpd?"
                 callback.invoke(
                     ExtractorLink(
                         source = "INDIAN TV",
@@ -125,7 +124,7 @@ class IndianTVProvider : MainAPI() {
                         url = link,
                         referer = "",
                         quality = Qualities.Unknown.value,
-                        isM3u8 = true
+                        isM3u8 = false // Since it's a .mpd file, not .m3u8
                     )
                 )
             }
