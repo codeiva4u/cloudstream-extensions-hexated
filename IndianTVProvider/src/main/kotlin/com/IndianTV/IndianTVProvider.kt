@@ -115,7 +115,7 @@ class IndianTVProvider : MainAPI() {
             }
             data.contains("tata") -> {
                 val channelID = data.substringAfter("id=").substringBefore("&")
-                val link = "https://bpprod7catchup.akamaized.net/bpk-tv?id=$channelID&e=.m3u8"
+                val link = "https://bpprod7catchup.akamaized.net/bpk-tv/irdeto_com_Channel_$channelID/output/dash/stream.m3u8"
                 callback.invoke(
                     ExtractorLink(
                         source = "INDIAN TV",
