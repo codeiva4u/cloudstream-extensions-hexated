@@ -125,7 +125,7 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
         }
     }
 
-    private suspend fun getEmbed(postid: String?, nume: String, referUrl: String?): NiceResponse {
+   private suspend fun getEmbed(postid: String?, nume: String, referUrl: String?): NiceResponse {
         val body = FormBody.Builder()
             .addEncoded("action", "doo_player_ajax")
             .addEncoded("post", postid.toString())
@@ -147,7 +147,6 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
 
     override suspend fun load(url: String): LoadResponse? {
         val doc = app.get(url).document
-        //Log.d("Doc", doc.toString())
         val titleL = doc.selectFirst("div.sheader > div.data > h1")?.text()?.toString()?.trim()
             ?: return null
         val titleRegex = Regex("(^.*\\)\\d*)")
@@ -157,15 +156,12 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
             doc.select("#contenedor").toString().substringAfter("background-image:url(")
                 .substringBefore(");")
         )
-        //Log.d("poster", poster.toString())
         val tags = doc.select("div.sgeneros > a").map { it.text() }
         val year =
             doc.selectFirst("span.date")?.text()?.toString()?.substringAfter(",")?.trim()?.toInt()
-        //Log.d("year", year.toString())
         val description = doc.selectFirst("#info div.wp-content p")?.text()?.trim()
-        val type = if (url.contains("tvshows")) TvType.TvSeries else TvType.Movie
-        //Log.d("desc", description.toString())
-        val trailerRegex = Regex("\"http.*\"")
+        val type =
+            if (url.contains("tvshows") || url.contains("tvchannels")) TvType.TvSeries else TvType.Movie
         var trailer = if (type == TvType.Movie)
             fixUrlNull(
                 getEmbed(
@@ -176,14 +172,12 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
                 ).parsed<TrailerUrl>().embedUrl
             )
         else fixUrlNull(doc.select("iframe.rptss").attr("src").toString())
+        val trailerRegex = Regex("\"http.*\"")
         trailer = trailerRegex.find(trailer.toString())?.value.toString()
-        //Log.d("trailer", trailer.toString())
         val rating = doc.select("span.dt_rating_vgs").text().toRatingInt()
-        //Log.d("rating", rating.toString())
         val duration =
             doc.selectFirst("span.runtime")?.text()?.toString()?.removeSuffix(" Min.")?.trim()
                 ?.toInt()
-        //Log.d("dur", duration.toString())
         val actors =
             doc.select("div.person").map {
                 ActorData(
@@ -253,7 +247,7 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
     ): Boolean {
         val req = app.get(data).document
         Log.d("Phisher Test Load url", data)
-        req.select("ul#playeroptionsul li").map {
+        req.select("ul#playeroptionsul li, ul#channel-options li").map {
             Triple(
                 it.attr("data-post"),
                 it.attr("data-nume"),
