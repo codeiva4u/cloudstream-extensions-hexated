@@ -28,7 +28,7 @@ class server2 : VidhideExtractor() {
 
 class Gogoanime : VidhideExtractor() {
     override var name = "Gogoanime"
-    override var mainUrl = "https://bpprod2catchup.akamaized.net"
+    override var mainUrl = "https://gogoanime.website/play.php?id"
 }
 
 
