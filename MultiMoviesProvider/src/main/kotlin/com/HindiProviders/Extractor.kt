@@ -1,8 +1,12 @@
 package com.HindiProviders
 
+import com.lagradost.cloudstream3.SubtitleFile
+import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
 import com.lagradost.cloudstream3.extractors.VidhideExtractor
-
+import com.lagradost.cloudstream3.utils.ExtractorApi
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.getQualityFromName
 
 class Multimovies : StreamWishExtractor() {
     override var name = "Multimovies Cloud"
@@ -59,4 +63,4 @@ class Gogoanime : ExtractorApi() {
         }
     }
 }
-
+   
