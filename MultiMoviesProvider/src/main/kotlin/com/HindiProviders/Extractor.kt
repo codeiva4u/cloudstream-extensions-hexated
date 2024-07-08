@@ -25,14 +25,38 @@ class server2 : VidhideExtractor() {
 }
 
 
-class gogoanime : VidhideExtractor() {
-    override var name = "Gogoanime"
-    override var mainUrl = "https://gogoanime.website"
-}
+class Gogoanime : ExtractorApi() {
+    override var name = "GogoAnime"
+    override val mainUrl = "https://gogoanime.website"
+    override val requiresReferer = false
 
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val doc = app.get(
+            url,
+            referer = referer,
+            allowRedirects = false
+        ).document
 
-open class momixtv : StreamWishExtractor() {
-    override var name = "MomixTV"
-    override var mainUrl = "https://gogoanime.website"
+        val videoElement = doc.select("video.jw-video").first()
+        val videoUrl = videoElement?.attr("src")
+
+        if (!videoUrl.isNullOrBlank()) {
+            callback(
+                ExtractorLink(
+                    this.name,
+                    this.name,
+                    videoUrl,
+                    referer ?: "$mainUrl/",
+                    getQualityFromName(""),
+                    videoUrl.contains("m3u8")
+                )
+            )
+        }
+    }
 }
 
