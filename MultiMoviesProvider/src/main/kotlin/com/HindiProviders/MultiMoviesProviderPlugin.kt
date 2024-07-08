@@ -21,7 +21,7 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Animezia())
         registerExtractorAPI(server2())
         registerExtractorAPI(MultimoviesAIO())
-        registerExtractorAPI(GMPlayer())
-        registerExtractorAPI(Gogoanime())
+        registerExtractorAPI(momixtv())
+        registerExtractorAPI(gogoanime())
     }
 }
