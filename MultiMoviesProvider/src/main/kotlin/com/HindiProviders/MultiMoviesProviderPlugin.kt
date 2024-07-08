@@ -1,7 +1,6 @@
 package com.HindiProviders
 
 import android.content.Context
-import com.IndianTV.IndianTVProvider
 import com.lagradost.cloudstream3.extractors.DoodLaExtractor
 import com.lagradost.cloudstream3.extractors.MixDrop
 import com.lagradost.cloudstream3.extractors.XStreamCdn
@@ -22,4 +21,5 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(Gogoanime())
     }
+
 }
