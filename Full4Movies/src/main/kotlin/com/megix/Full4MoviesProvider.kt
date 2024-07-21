@@ -18,11 +18,12 @@ class Full4MoviesProvider : MainAPI() { // all providers must be an instance of 
     )
 
     override val mainPage = mainPageOf(
-        "$mainUrl/page/%d/" to "Home",
-        "$mainUrl/category/web-series/page/%d/" to "Web Series",
+        "$mainUrl/page/%d/" to "Latest Release Movies",
+        "$mainUrl/hollywood-hindi-movies/page/%d/" to "Hollywood Hindi Movies",
         "$mainUrl/category/south-indian-hindi-dubbed-movies/page/%d/" to "South Hindi Dubbed",
         "$mainUrl/category/bollywood-movies-download/page/%d/" to "Bollywood Movies",
-        "$mainUrl/category/hollywood-movies/page/%d/" to "Hollywood Movies",
+        "$mainUrl/category/web-series/page/%d/" to "Web Series",
+        
     )
 
     override suspend fun getMainPage(
