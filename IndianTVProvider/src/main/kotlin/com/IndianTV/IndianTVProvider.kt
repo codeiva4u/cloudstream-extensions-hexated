@@ -12,7 +12,7 @@ class IndianTVProvider : MainAPI() {
     override var name = "Indian TV"
     override val hasMainPage = true
     override var lang = "hi"
-    override val supportedTypes = setOf(TvType.Live)
+    override val supportedTypes = setOf(TvType.Movie)
 
     override val mainPage = mainPageOf(
         INDIANTATAAPI to "TATA",
@@ -43,7 +43,7 @@ class IndianTVProvider : MainAPI() {
         val title = this.select("h2.text-center").text()
         val href = fixUrl(this.select("a").attr("href"))
         val posterUrl = fixUrlNull(this.select("img").attr("src"))
-        return newMovieSearchResponse(title, href, TvType.Live) {
+        return newMovieSearchResponse(title, href, TvType.Movie) {
             this.posterUrl = posterUrl
         }
     }
@@ -65,7 +65,7 @@ class IndianTVProvider : MainAPI() {
             val poster = "https://i0.wp.com/www.smartprix.com/bytes/wp-content/uploads/2021/08/JioTV-on-smart-TV.png?fit=1200%2C675&ssl=1"
             val showname = "JioTV"
 
-            return newMovieLoadResponse(title, url, TvType.Live, url) {
+            return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = poster
                 this.plot = showname
             }
@@ -74,7 +74,7 @@ class IndianTVProvider : MainAPI() {
             val poster = "https://cdn.mos.cms.futurecdn.net/iYdoTcTScdApk3JV5GfEAT-1920-80.jpg"
             val showname = "TATA"
 
-            return newMovieLoadResponse(title, url, TvType.Live, url) {
+            return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = poster
                 this.plot = showname
             }
@@ -84,13 +84,13 @@ class IndianTVProvider : MainAPI() {
         val poster = "https://cdn.mos.cms.futurecdn.net/iYdoTcTScdApk3JV5GfEAT-1920-80.jpg"
         val showname = document.selectFirst("div.program-info > div.program-name")?.text()?.trim().toString()
 
-        return newMovieLoadResponse(title, url, TvType.Live, url) {
+        return newMovieLoadResponse(title, url, TvType.Movie, url) {
             this.posterUrl = poster
             this.plot = showname
         }
     }
 
-  @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation")
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
