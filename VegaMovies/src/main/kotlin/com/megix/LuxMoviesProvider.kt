@@ -23,7 +23,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
 
-open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an instance of MainAPI
+open class LuxMoviesProvider : MainAPI() { // all providers must be an instance of MainAPI
     private val urls = listOf("https://luxmovies.live", "https://vegamovies.nz")
     override var mainUrl = urls[0] // primary URL
     override var name = "LuxVegaMovies"
@@ -130,13 +130,13 @@ open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an insta
         val aTagRating = aTagRatings.firstOrNull()
         val ratingText = aTagRating ?.selectFirst("span")?.text()
         val rating = ratingText ?.substringAfter("-")
-                                ?.substringBefore("/")
-                                ?.trim()
-                                ?.toRatingInt()
+            ?.substringBefore("/")
+            ?.trim()
+            ?.toRatingInt()
 
         val tvType = if (url.contains("season") ||
-                  (title?.contains("(Season") ?: false) ||
-                  Regex("Series synopsis").containsMatchIn(documentText) || Regex("Series Name").containsMatchIn(documentText)) {
+            (title?.contains("(Season") ?: false) ||
+            Regex("Series synopsis").containsMatchIn(documentText) || Regex("Series Name").containsMatchIn(documentText)) {
             TvType.TvSeries
         } else {
             TvType.Movie
@@ -144,12 +144,12 @@ open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an insta
 
         if (tvType == TvType.TvSeries) {
             var hTags = div.select("h3:matches((?i)(4K|[0-9]*0p)),h5:matches((?i)(4K|[0-9]*0p))")
-                 .filter { element -> !element.text().contains("Zip", true) }
+                .filter { element -> !element.text().contains("Zip", true) }
             val tvSeriesEpisodes = mutableListOf<Episode>()
             var seasonNum = 1
             val seasonList = mutableListOf<Pair<String, Int>>()
 
-             for(tag in hTags) {
+            for(tag in hTags) {
                 val realSeasonRegex = Regex("""(?:Season |S)(\d+)""")
                 val realSeason = realSeasonRegex.find(tag.toString()) ?. groupValues ?. get(1) ?: " Unknown"
                 val qualityRegex = """(1080p|720p|480p|2160p|4K|[0-9]*0p)""".toRegex(RegexOption.IGNORE_CASE)
@@ -159,17 +159,17 @@ open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an insta
                 seasonList.add("S$realSeason $quality $size" to seasonNum)
 
                 val pTag = tag.nextElementSibling()
-                
+
                 val aTags: List<Element>? = if (pTag != null && pTag.tagName() == "p") {
                     pTag.select("a")
                 } else {
                     tag.select("a")
                 }
 
-                var unilink = aTags ?. find { 
+                var unilink = aTags ?. find {
                     it.text().contains("V-Cloud", ignoreCase = true) ||
-                    it.text().contains("Episode", ignoreCase = true) ||
-                    it.text().contains("Download", ignoreCase = true)
+                            it.text().contains("Episode", ignoreCase = true) ||
+                            it.text().contains("Download", ignoreCase = true)
                 }
 
                 if (unilink == null) {
@@ -181,7 +181,7 @@ open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an insta
                 var Eurl = unilink ?. attr("href")
 
                 Eurl ?. let { eurl ->
-                    val document2 = app.get(eurl).document     
+                    val document2 = app.get(eurl).document
                     val vcloudRegex = Regex("""https:\/\/vcloud\.lol\/[^\s"]+""")
                     var vcloudLinks = vcloudRegex.findAll(document2.html()).mapNotNull { it.value }.toList()
                     if(vcloudLinks.isEmpty()) {
@@ -226,12 +226,12 @@ open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an insta
         if (data.contains("vcloud.lol") || data.contains("fastdl")) {
             var url = data
             if(data.contains("vcloud.lol/api")) {
-                val document = app.get(data).document         
+                val document = app.get(data).document
                 url = document.selectFirst("h4 > a")?.attr("href") ?:""
             }
             loadExtractor(url, subtitleCallback, callback)
             return true
-        } 
+        }
         else {
             val document = app.get(data).document
             val aTags = document.select("p > a")
@@ -243,8 +243,8 @@ open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an insta
                 serverLinks.mapNotNull {
                     val url = it.attr("href")
                     if(url.contains("vcloud") || url.contains("fastdl")) {
-                        loadExtractor(url, subtitleCallback, callback) 
-                    } 
+                        loadExtractor(url, subtitleCallback, callback)
+                    }
                 }
             }
             return true
