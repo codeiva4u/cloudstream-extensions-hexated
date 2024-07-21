@@ -15,59 +15,52 @@ class VCloud : ExtractorApi() {
         callback: (ExtractorLink) -> Unit
     ) {
         val doc = app.get(url).document
-        val scriptTag = doc.selectFirst("script:containsData(url)")?.toString()
-        val urlValue = scriptTag?.let { Regex("var url = '([^']*)'").find(it) ?. groupValues ?. get(1) }
-            ?: ""
+        val scriptTag = doc.selectFirst("script:containsData(url)").toString()
+        val urlValue = Regex("var url = '([^']*)'").find(scriptTag) ?. groupValues ?. get(1) ?: ""
         val document = app.get(urlValue).document
 
         val size = document.selectFirst("i#size") ?. text()
         val div = document.selectFirst("div.card-body")
         val header = document.selectFirst("div.card-header") ?. text()
-        if (div != null) {
-            div.select("a").apmap {
-                val link = it.attr("href")
-                if (link.contains("pixeldra")) {
-                    callback.invoke(
-                        ExtractorLink(
-                            "Pixeldrain",
-                            "Pixeldrain $size",
-                            link,
-                            "",
-                            getIndexQuality(header),
-                        )
+        div.select("a").apmap {
+            val link = it.attr("href")
+            if (link.contains("pixeldra")) {
+                callback.invoke(
+                    ExtractorLink(
+                        "Pixeldrain",
+                        "Pixeldrain $size",
+                        link,
+                        "",
+                        getIndexQuality(header),
                     )
-                }
-                else if(link.contains("dl.php")) {
-                    val downloadPage = app.get(link).document
-                    val downloadLink = downloadPage.selectFirst("a#vd")?.attr("href")
-                    downloadLink?.let { it1 ->
-                        ExtractorLink(
-                            "V-Cloud[Download]",
-                            "V-Cloud[Download] $size",
-                            it1,
-                            "",
-                            getIndexQuality(header),
-                        )
-                    }?.let { it2 ->
-                        callback.invoke(
-                            it2
-                        )
-                    }
-                }
-                else if(link.contains(".dev")) {
-                    callback.invoke(
-                        ExtractorLink(
-                            "V-Cloud",
-                            "V-Cloud $size",
-                            link,
-                            "",
-                            getIndexQuality(header),
-                        )
+                )
+            }
+            else if(link.contains("dl.php")) {
+                val response = app.get(link, allowRedirects = false)
+                val downloadLink = response.headers["location"].toString().split("link=").getOrNull(1) ?: link
+                callback.invoke(
+                    ExtractorLink(
+                        "V-Cloud[Download]",
+                        "V-Cloud[Download] $size",
+                        downloadLink,
+                        "",
+                        getIndexQuality(header),
                     )
-                }
-                else {
-                    loadExtractor(link, subtitleCallback, callback)
-                }
+                )
+            }
+            else if(link.contains(".dev")) {
+                callback.invoke(
+                    ExtractorLink(
+                        "V-Cloud",
+                        "V-Cloud $size",
+                        link,
+                        "",
+                        getIndexQuality(header),
+                    )
+                )
+            }
+            else {
+                loadExtractor(link, subtitleCallback, callback)
             }
         }
     }
