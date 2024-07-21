@@ -20,9 +20,10 @@ open class VegaMoviesProvider : MainAPI() { // all providers must be an instance
     )
 
     override val mainPage = mainPageOf(
-        "$mainUrl/page/%d/" to "Home",
         "$mainUrl/category/featured/" to "Latest Movies",
         "$mainUrl/category/dual-audio-movies/" to "Hollywood MOVIES",
+        "$mainUrl/category/hindi-dubbed-movies/" to "SOUTH DUBBED MOVIES",
+        "$mainUrl/category/bollywood/" to "BOLLYWOOD MOVIES",
         "$mainUrl/category/featured/page/%d/" to "Amazon Prime",
         "$mainUrl/category/web-series/netflix/page/%d/" to "Netflix",
         "$mainUrl/category/web-series/disney-plus-hotstar/page/%d/" to "Disney Plus Hotstar",
