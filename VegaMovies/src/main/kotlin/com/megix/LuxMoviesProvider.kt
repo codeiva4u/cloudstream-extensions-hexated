@@ -19,7 +19,9 @@ class LuxMoviesProvider : VegaMoviesProvider() { // all providers must be an ins
     )
 
     override val mainPage = mainPageOf(
-        "$mainUrl/category/hindi-dubbed-movies/" to "HINDI DUBBED MOVIES",
+        "$mainUrl/ccategory/featured/" to "LATEST RELEASE MOVIES",
+        "$mainUrl/category/dual-audio-movies/" to "Hollywood DUBBED MOVIES",
+        "$mainUrl/category/hindi-dubbed-movies/" to "SOUTH DUBBED MOVIES",
         "$mainUrl/category/bollywood/" to "BOLLYWOOD MOVIES",
         "$mainUrl/category/web-series/netflix/page/%d/" to "Netflix",
         "$mainUrl/category/web-series/disney-plus-hotstar/page/%d/" to "Disney Plus Hotstar",
