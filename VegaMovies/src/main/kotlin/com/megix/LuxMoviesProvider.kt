@@ -1,13 +1,21 @@
 package com.megix
 
-import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
+import com.lagradost.cloudstream3.HomePageResponse
+import com.lagradost.cloudstream3.MainAPI
+import com.lagradost.cloudstream3.MainPageRequest
+import com.lagradost.cloudstream3.SearchResponse
+import com.lagradost.cloudstream3.TvType
+import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.fixUrl
+import com.lagradost.cloudstream3.mainPageOf
 import com.lagradost.cloudstream3.network.CloudflareKiller
+import com.lagradost.cloudstream3.newHomePageResponse
+import com.lagradost.cloudstream3.newMovieSearchResponse
+import org.jsoup.nodes.Element
 
-
-class LuxMoviesProvider : VegaMoviesProvider() { // all providers must be an instance of MainAPI
-    override var mainUrl = "https://luxmovies.live"
+class LuxMoviesProvider : MainAPI() { // सभी प्रोवाइडर MainAPI का इंस्टेंस होना चाहिए
+    private val urls = listOf("https://luxmovies.live", "https://vegamovies.nz")
+    override var mainUrl = urls[0] // प्राथमिक URL सेट करें
     override var name = "LuxMovies"
     override val hasMainPage = true
     override var lang = "hi"
@@ -19,10 +27,7 @@ class LuxMoviesProvider : VegaMoviesProvider() { // all providers must be an ins
     )
 
     override val mainPage = mainPageOf(
-        "$mainUrl/ccategory/featured/" to "LATEST RELEASE MOVIES",
-        "$mainUrl/category/dual-audio-movies/" to "Hollywood DUBBED MOVIES",
-        "$mainUrl/category/hindi-dubbed-movies/" to "SOUTH DUBBED MOVIES",
-        "$mainUrl/category/bollywood/" to "BOLLYWOOD MOVIES",
+        "$mainUrl/page/%d/" to "Home",
         "$mainUrl/category/web-series/netflix/page/%d/" to "Netflix",
         "$mainUrl/category/web-series/disney-plus-hotstar/page/%d/" to "Disney Plus Hotstar",
         "$mainUrl/category/web-series/amazon-prime-video/page/%d/" to "Amazon Prime",
@@ -37,7 +42,12 @@ class LuxMoviesProvider : VegaMoviesProvider() { // all providers must be an ins
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val document = app.get(request.data.format(page), interceptor = cfInterceptor).document
+        var document = try {
+            app.get(request.data.format(page), interceptor = cfInterceptor).document
+        } catch (e: Exception) {
+            app.get(request.data.format(page).replace(urls[0], urls[1]), interceptor = cfInterceptor).document
+        }
+
         val home = document.select("article.post-item").mapNotNull {
             it.toSearchResult()
         }
@@ -61,11 +71,16 @@ class LuxMoviesProvider : VegaMoviesProvider() { // all providers must be an ins
             this.posterUrl = posterUrl
         }
     }
+
     override suspend fun search(query: String): List<SearchResponse> {
         val searchResponse = mutableListOf<SearchResponse>()
 
         for (i in 1..3) {
-            val document = app.get("$mainUrl/page/$i/?s=$query", interceptor = cfInterceptor).document
+            var document = try {
+                app.get("$mainUrl/page/$i/?s=$query", interceptor = cfInterceptor).document
+            } catch (e: Exception) {
+                app.get("${urls[1]}/page/$i/?s=$query", interceptor = cfInterceptor).document
+            }
 
             val results = document.select("article.post-item").mapNotNull { it.toSearchResult() }
 
@@ -77,5 +92,4 @@ class LuxMoviesProvider : VegaMoviesProvider() { // all providers must be an ins
 
         return searchResponse
     }
-
 }
