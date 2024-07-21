@@ -21,13 +21,14 @@ open class VegaMoviesProvider : MainAPI() { // all providers must be an instance
 
     override val mainPage = mainPageOf(
         "$mainUrl/page/%d/" to "Home",
+        "$mainUrl/category/featured/" to "Latest Movies",
+        "$mainUrl/category/dual-audio-movies/" to "Hollywood MOVIES",
         "$mainUrl/category/featured/page/%d/" to "Amazon Prime",
         "$mainUrl/category/web-series/netflix/page/%d/" to "Netflix",
         "$mainUrl/category/web-series/disney-plus-hotstar/page/%d/" to "Disney Plus Hotstar",
         "$mainUrl/category/web-series/amazon-prime-video/page/%d/" to "Amazon Prime",
         "$mainUrl/category/web-series/mx-original/page/%d/" to " MX Original",
-        "$mainUrl/category/anime-series/page/%d/" to "Anime Series",
-        "$mainUrl/category/korean-series/page/%d/" to "Korean Series",
+        
     )
 
     override suspend fun getMainPage(
