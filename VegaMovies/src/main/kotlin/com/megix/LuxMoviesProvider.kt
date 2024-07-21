@@ -37,7 +37,10 @@ open class LuxMoviesProvider : MainAPI() { // all providers must be an instance 
     )
 
     override val mainPage = mainPageOf(
-        "$mainUrl/page/%d/" to "Home",
+        "$mainUrl/ategory/featured/" to "Latest Release",
+        "$mainUrl/category/dual-audio-movies/" to "Hollywood Dubbed",
+        "$mainUrl/category/hindi-dubbed-movies/" to "South Dubbed",
+        "$mainUrl/category/bollywood/" to "Bollywood",
         "$mainUrl/category/web-series/netflix/page/%d/" to "Netflix",
         "$mainUrl/category/web-series/disney-plus-hotstar/page/%d/" to "Disney Plus Hotstar",
         "$mainUrl/category/web-series/amazon-prime-video/page/%d/" to "Amazon Prime",
@@ -46,9 +49,6 @@ open class LuxMoviesProvider : MainAPI() { // all providers must be an instance 
         "$mainUrl/category/web-series/sonyliv/page/%d/" to "Sony Liv",
         "$mainUrl/category/web-series/zee5-originals/page/%d/" to "Zee5",
         "$mainUrl/category/web-series/alt-balaji-web-series/page/%d/" to "ALT Balaji",
-        "$mainUrl/category/featured/page/%d/" to "Featured",
-        "$mainUrl/category/anime-series/page/%d/" to "Anime Series",
-        "$mainUrl/category/korean-series/page/%d/" to "Korean Series"
     )
 
     override suspend fun getMainPage(
