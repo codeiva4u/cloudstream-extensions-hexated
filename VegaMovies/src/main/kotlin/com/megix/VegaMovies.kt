@@ -8,8 +8,8 @@ import com.lagradost.cloudstream3.extractors.Gofile
 @CloudstreamPlugin
 class VegaMovies: Plugin() {
     override fun load(context: Context) {
-        // All providers should be added in this manner. Please don't edit the providers list directly. 
-     // registerMainAPI(VegaMoviesProvider())
+        // All providers should be added in this manner. Please don't edit the providers list directly.
+        registerMainAPI(VegaMoviesProvider())
         registerMainAPI(LuxMoviesProvider())
         registerExtractorAPI(VCloud())
         registerExtractorAPI(FastDL())
