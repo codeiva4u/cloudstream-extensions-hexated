@@ -1,0 +1,162 @@
+[
+    {
+        "iconUrl": "http://cinemaluxe.world/wp-content/uploads/2024/07/fresh-logo-dark-theme-.webp",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 23512,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "megix"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 5,
+        "internalName": "Cinemaluxe",
+        "description": "",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/Cinemaluxe.cs3",
+        "name": "Cinemaluxe"
+    },
+    {
+        "iconUrl": "https://www.full4movies.email/wp-content/uploads/2023/12/cropped-cropped-admin-ajax-1.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 13627,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "megix"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 10,
+        "internalName": "Full4Movies",
+        "description": "Contains Hindi Movies and TV Series upto 1080p",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/Full4Movies.cs3",
+        "name": "Full4Movies"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=movierulzhd.green&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 25828,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "HindiProvider"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 13,
+        "internalName": "Movierulzhd",
+        "description": "Includes: Hdmovie2",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/Movierulzhd.cs3",
+        "name": "Movierulzhd"
+    },
+    {
+        "iconUrl": "https://i.imgur.com/9bGkGMi.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 19505,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "megix"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 5,
+        "internalName": "MoviesDrive",
+        "description": "",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/MoviesDrive.cs3",
+        "name": "MoviesDrive"
+    },
+    {
+        "iconUrl": "https://raw.githubusercontent.com/LikDev-256/likdev256-tamil-providers/master/MultiMoviesProvider/icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 21792,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "HindiProviders"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Live"
+        ],
+        "version": 12,
+        "internalName": "MultiMoviesProvider",
+        "description": "Includes: MultiMoviesProvider IndianTVProvider",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/MultiMoviesProvider.cs3",
+        "name": "MultiMoviesProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=prmovies.bio&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 17655,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 31,
+        "internalName": "PrmoviesProvider",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/PrmoviesProvider.cs3",
+        "name": "PrmoviesProvider"
+    },
+    {
+        "iconUrl": "https://vegamovies.nz/wp-content/uploads/2024/04/logo.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 22720,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "megix"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 37,
+        "internalName": "VegaMovies",
+        "description": "Includes LuxMovies",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/VegaMovies.cs3",
+        "name": "VegaMovies"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=yomovies.rest&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/codeiva4u/cloudstream-extensions-hexated",
+        "fileSize": 18739,
+        "status": 1,
+        "language": "hi",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 49,
+        "internalName": "YomoviesProvider",
+        "description": "Includes: Watchomovies(NS*W), Max resolution is 720p in both extensions.",
+        "url": "https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/YomoviesProvider.cs3",
+        "name": "YomoviesProvider"
+    }
+]
