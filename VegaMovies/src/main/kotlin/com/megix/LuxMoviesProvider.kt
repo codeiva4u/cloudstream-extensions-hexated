@@ -1,22 +1,32 @@
 package com.megix
 
+import com.lagradost.cloudstream3.Episode
 import com.lagradost.cloudstream3.HomePageResponse
+import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.SearchResponse
+import com.lagradost.cloudstream3.SeasonData
+import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.fixUrl
+import com.lagradost.cloudstream3.fixUrlNull
 import com.lagradost.cloudstream3.mainPageOf
 import com.lagradost.cloudstream3.network.CloudflareKiller
 import com.lagradost.cloudstream3.newHomePageResponse
+import com.lagradost.cloudstream3.newMovieLoadResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
+import com.lagradost.cloudstream3.newTvSeriesLoadResponse
+import com.lagradost.cloudstream3.toRatingInt
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
 
-class LuxMoviesProvider : MainAPI() { // सभी प्रोवाइडर MainAPI का इंस्टेंस होना चाहिए
+open class LuxVegaMoviesProvider : MainAPI() { // all providers must be an instance of MainAPI
     private val urls = listOf("https://luxmovies.live", "https://vegamovies.nz")
-    override var mainUrl = urls[0] // प्राथमिक URL सेट करें
-    override var name = "LuxMovies"
+    override var mainUrl = urls[0] // primary URL
+    override var name = "LuxVegaMovies"
     override val hasMainPage = true
     override var lang = "hi"
     override val hasDownloadSupport = true
@@ -36,13 +46,16 @@ class LuxMoviesProvider : MainAPI() { // सभी प्रोवाइडर M
         "$mainUrl/category/web-series/sonyliv/page/%d/" to "Sony Liv",
         "$mainUrl/category/web-series/zee5-originals/page/%d/" to "Zee5",
         "$mainUrl/category/web-series/alt-balaji-web-series/page/%d/" to "ALT Balaji",
+        "$mainUrl/category/featured/page/%d/" to "Featured",
+        "$mainUrl/category/anime-series/page/%d/" to "Anime Series",
+        "$mainUrl/category/korean-series/page/%d/" to "Korean Series"
     )
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        var document = try {
+        val document = try {
             app.get(request.data.format(page), interceptor = cfInterceptor).document
         } catch (e: Exception) {
             app.get(request.data.format(page).replace(urls[0], urls[1]), interceptor = cfInterceptor).document
@@ -63,9 +76,12 @@ class LuxMoviesProvider : MainAPI() { // सभी प्रोवाइडर M
                 it
             }
         } ?: ""
+
         val href = fixUrl(this.selectFirst("a")?.attr("href").toString())
-        val imgTag = this.selectFirst("img.blog-picture")
-        val posterUrl = imgTag?.attr("data-src")
+        var posterUrl = fixUrlNull(this.selectFirst("img.blog-picture")?.attr("data-src").toString())
+        if (posterUrl == null) {
+            posterUrl = fixUrlNull(this.selectFirst("img.blog-picture")?.attr("src").toString())
+        }
 
         return newMovieSearchResponse(trimTitle, href, TvType.Movie) {
             this.posterUrl = posterUrl
@@ -76,7 +92,7 @@ class LuxMoviesProvider : MainAPI() { // सभी प्रोवाइडर M
         val searchResponse = mutableListOf<SearchResponse>()
 
         for (i in 1..3) {
-            var document = try {
+            val document = try {
                 app.get("$mainUrl/page/$i/?s=$query", interceptor = cfInterceptor).document
             } catch (e: Exception) {
                 app.get("${urls[1]}/page/$i/?s=$query", interceptor = cfInterceptor).document
@@ -91,5 +107,147 @@ class LuxMoviesProvider : MainAPI() { // सभी प्रोवाइडर M
         }
 
         return searchResponse
+    }
+
+    override suspend fun load(url: String): LoadResponse? {
+        val document = app.get(url).document
+        val title = document.selectFirst("meta[property=og:title]")?.attr("content")
+        val trimTitle = title ?.let {
+            if (it.contains("Download ")) {
+                it.replace("Download ", "")
+            } else {
+                it
+            }
+        } ?: ""
+
+        val posterUrl = fixUrlNull(document.selectFirst("meta[property=og:image]")?.attr("content"))
+        val documentText = document.text()
+        val div = document.select("div.entry-content")
+        val hTagsDisc = div.select("h3:matches((?i)(SYNOPSIS|PLOT)), h4:matches((?i)(SYNOPSIS|PLOT))")
+        val pTagDisc = hTagsDisc.first()?.nextElementSibling()
+        val plot = pTagDisc ?.text()
+        val aTagRatings = div.select("a:matches((?i)(Rating))")
+        val aTagRating = aTagRatings.firstOrNull()
+        val ratingText = aTagRating ?.selectFirst("span")?.text()
+        val rating = ratingText ?.substringAfter("-")
+                                ?.substringBefore("/")
+                                ?.trim()
+                                ?.toRatingInt()
+
+        val tvType = if (url.contains("season") ||
+                  (title?.contains("(Season") ?: false) ||
+                  Regex("Series synopsis").containsMatchIn(documentText) || Regex("Series Name").containsMatchIn(documentText)) {
+            TvType.TvSeries
+        } else {
+            TvType.Movie
+        }
+
+        if (tvType == TvType.TvSeries) {
+            var hTags = div.select("h3:matches((?i)(4K|[0-9]*0p)),h5:matches((?i)(4K|[0-9]*0p))")
+                 .filter { element -> !element.text().contains("Zip", true) }
+            val tvSeriesEpisodes = mutableListOf<Episode>()
+            var seasonNum = 1
+            val seasonList = mutableListOf<Pair<String, Int>>()
+
+             for(tag in hTags) {
+                val realSeasonRegex = Regex("""(?:Season |S)(\d+)""")
+                val realSeason = realSeasonRegex.find(tag.toString()) ?. groupValues ?. get(1) ?: " Unknown"
+                val qualityRegex = """(1080p|720p|480p|2160p|4K|[0-9]*0p)""".toRegex(RegexOption.IGNORE_CASE)
+                val quality = qualityRegex.find(tag.toString()) ?. groupValues ?. get(1) ?: " Unknown"
+                val sizeRegex = Regex("""\b\d+(?:\.\d+)?(?:MB|GB)\b""")
+                val size = sizeRegex.find(tag.toString())?.value ?: ""
+                seasonList.add("S$realSeason $quality $size" to seasonNum)
+
+                val pTag = tag.nextElementSibling()
+                
+                val aTags: List<Element>? = if (pTag != null && pTag.tagName() == "p") {
+                    pTag.select("a")
+                } else {
+                    tag.select("a")
+                }
+
+                var unilink = aTags ?. find { 
+                    it.text().contains("V-Cloud", ignoreCase = true) ||
+                    it.text().contains("Episode", ignoreCase = true) ||
+                    it.text().contains("Download", ignoreCase = true)
+                }
+
+                if (unilink == null) {
+                    unilink = aTags ?. find {
+                        it.text().contains("G-Direct", ignoreCase = true)
+                    }
+                }
+
+                var Eurl = unilink ?. attr("href")
+
+                Eurl ?. let { eurl ->
+                    val document2 = app.get(eurl).document     
+                    val vcloudRegex = Regex("""https:\/\/vcloud\.lol\/[^\s"]+""")
+                    var vcloudLinks = vcloudRegex.findAll(document2.html()).mapNotNull { it.value }.toList()
+                    if(vcloudLinks.isEmpty()) {
+                        val fastDlRegex = Regex("""https:\/\/fastdl.icu\/embed\?download=[a-zA-Z0-9]+""")
+                        vcloudLinks = fastDlRegex.findAll(document2.html()).mapNotNull { it.value }.toList()
+                    }
+                    val episodes = vcloudLinks.mapNotNull { vcloudlink ->
+                        Episode(
+                            name = "S${realSeason} E${vcloudLinks.indexOf(vcloudlink) + 1} ${quality}",
+                            data = vcloudlink,
+                            season = seasonNum,
+                            episode = vcloudLinks.indexOf(vcloudlink) + 1,
+                        )
+                    }
+
+                    tvSeriesEpisodes.addAll(episodes)
+                    seasonNum++
+                }
+            }
+            return newTvSeriesLoadResponse(trimTitle, url, TvType.TvSeries, tvSeriesEpisodes) {
+                this.posterUrl = posterUrl
+                this.plot = plot
+                this.rating = rating
+                this.seasonNames = seasonList.map {(name, int) -> SeasonData(int, name)}
+            }
+        }
+        else {
+            return newMovieLoadResponse(trimTitle, url, TvType.Movie, url) {
+                this.posterUrl = posterUrl
+                this.plot = plot
+                this.rating = rating
+            }
+        }
+    }
+
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        if (data.contains("vcloud.lol") || data.contains("fastdl")) {
+            var url = data
+            if(data.contains("vcloud.lol/api")) {
+                val document = app.get(data).document         
+                url = document.selectFirst("h4 > a")?.attr("href") ?:""
+            }
+            loadExtractor(url, subtitleCallback, callback)
+            return true
+        } 
+        else {
+            val document = app.get(data).document
+            val aTags = document.select("p > a")
+
+            aTags.mapNotNull { aTag ->
+                val link = aTag.attr("href")
+                val document2 = app.get(link).document
+                val serverLinks = document2.select("p > a")
+                serverLinks.mapNotNull {
+                    val url = it.attr("href")
+                    if(url.contains("vcloud") || url.contains("fastdl")) {
+                        loadExtractor(url, subtitleCallback, callback) 
+                    } 
+                }
+            }
+            return true
+        }
     }
 }
