@@ -33,14 +33,16 @@ class GDFlix : ExtractorApi() {
     override val mainUrl: String = "https://new2.gdflix.cfd"
     override val requiresReferer = false
 
-    private suspend fun extractBollyTag(url: String): String {
-        val tagDoc = app.get(url).text
-        return """\b\d{3,4}p\b""".toRegex().find(tagDoc)?.value?.trim() ?: ""
+    private suspend fun extractbollytag(url:String): String {
+        val tagdoc= app.get(url).text
+        val tags ="""\b\d{3,4}p\b""".toRegex().find(tagdoc) ?. value ?. trim() ?:""
+        return tags
     }
 
-    private suspend fun extractBollyTag2(url: String): String {
-        val tagDoc = app.get(url).text
-        return """\b\d{3,4}p\b\s(.*?)\[""".toRegex().find(tagDoc)?.groupValues?.get(1)?.trim() ?: ""
+    private suspend fun extractbollytag2(url:String): String {
+        val tagdoc= app.get(url).text
+        val tags ="""\b\d{3,4}p\b\s(.*?)\[""".toRegex().find(tagdoc) ?. groupValues ?. get(1) ?. trim() ?:""
+        return tags
     }
 
     private fun getBaseUrl(url: String): String {
@@ -55,136 +57,164 @@ class GDFlix : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        var currentUrl = url
-        val tags = extractBollyTag(currentUrl)
-        val tagQuality = extractBollyTag2(currentUrl)
-        if (currentUrl.startsWith("https://new2.gdflix.cfd/goto/token/")) {
-            val partialUrl = app.get(currentUrl).text.substringAfter("replace(\"").substringBefore("\")")
-            currentUrl = mainUrl + partialUrl
+        var url = url
+        val tags = extractbollytag(url)
+        val tagquality = extractbollytag2(url)
+        if (url.startsWith("https://new2.gdflix.cfd/goto/token/"))
+        {
+            val partialurl = app.get(url).text.substringAfter("replace(\"").substringBefore("\")")
+            url = mainUrl + partialurl
         }
+        else
+        {
+            url = url
+        }
+        app.get(url).document.select("div.text-center a").mapNotNull {
+            if (it.select("a").text().contains("FAST CLOUD DOWNLOAD"))
+            {
+                val link=it.attr("href")
+                val trueurl=app.get("https://new2.gdflix.cfd$link", timeout = 40L).document.selectFirst("a.btn-success")?.attr("href") ?:""
+                callback.invoke(
+                    ExtractorLink(
+                        "GDFlix[Fast Cloud]", "GDFLix[Fast Cloud] $tagquality", trueurl
+                            ?: "", "", getQualityFromName(tags)
+                    )
+                )
+            }
+            else if (it.select("a").text().contains("DRIVEBOT DOWNLOAD"))
+            {
+                val driveLink = it.attr("href")
+                val id = driveLink.substringAfter("id=").substringBefore("&")
+                val doId = driveLink.substringAfter("do=").substringBefore("==")
+                val indexbotlink = "https://indexbot.lol/download?id=${id}&do=${doId}"
+                val indexbotresponse = app.get(indexbotlink, timeout = 60L)
+                if(indexbotresponse.isSuccessful) {
+                    val cookiesSSID = indexbotresponse.cookies["PHPSESSID"]
+                    val indexbotDoc = indexbotresponse.document
+                    val token = Regex("""formData\.append\('token', '([a-f0-9]+)'\)""").find(indexbotDoc.toString()) ?. groupValues ?. get(1) ?: "token"
+                    val postId = Regex("""fetch\('\/download\?id=([a-zA-Z0-9\/+]+)'""").find(indexbotDoc.toString()) ?. groupValues ?. get(1) ?: "postId"
+                
+                    val requestBody = FormBody.Builder()
+                        .add("token", token)
+                        .build()
+                
+                    val headers = mapOf(
+                        "Referer" to indexbotlink
+                    )
+                
+                    val cookies = mapOf(
+                        "PHPSESSID" to "$cookiesSSID",
+                    )
+                
+                    val response = app.post(
+                        "https://indexbot.lol/download?id=${postId}",
+                        requestBody = requestBody,
+                        headers = headers,
+                        cookies = cookies,
+                        timeout = 60L
+                    ).toString()
+                
+                    var downloadlink = Regex("url\":\"(.*?)\"").find(response) ?. groupValues ?. get(1) ?: ""    
 
-        app.get(currentUrl).document.select("div.text-center a").mapNotNull {
-            when {
-                it.select("a").text().contains("FAST CLOUD DOWNLOAD") -> {
-                    val link = it.attr("href")
-                    val trueUrl = app.get("https://new2.gdflix.cfd$link", timeout = 40L).document.selectFirst("a.btn-success")?.attr("href") ?: ""
+                    downloadlink = downloadlink.replace("\\", "")                
+                
                     callback.invoke(
                         ExtractorLink(
-                            "GDFlix[Fast Cloud]", "GDFLix[Fast Cloud] $tagQuality", trueUrl, "", getQualityFromName(tags)
+                            "IndexBot", 
+                            "IndexBot $tagquality", 
+                            downloadlink, 
+                            "https://indexbot.lol/",
+                            getQualityFromName(tags)
                         )
                     )
                 }
-                it.select("a").text().contains("DRIVEBOT DOWNLOAD") -> {
-                    val driveLink = it.attr("href")
-                    val id = driveLink.substringAfter("id=").substringBefore("&")
-                    val doId = driveLink.substringAfter("do=").substringBefore("==")
-                    handleDriveBotDownload(id, doId, tags, tagQuality, callback)
-                }
-                it.select("a").text().contains("Instant Download") -> {
-                    val instantLink = it.attr("href")
-                    val token = instantLink.substringAfter("url=")
-                    val domain = getBaseUrl(instantLink)
-                    val downloadLink = app.post(
-                        url = "$domain/api",
-                        data = mapOf("keys" to token),
-                        referer = instantLink,
-                        headers = mapOf(
-                            "x-token" to "direct.zencloud.lol",
-                            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
-                        ),
-                        timeout = 100L
+
+                val drivebotlink = "https://drivebot.cfd/download?id=${id}&do=${doId}"
+                val drivebotresponse = app.get(drivebotlink, timeout = 60L)
+                if(drivebotresponse.isSuccessful) {
+                    val cookiesSSID = drivebotresponse.cookies["PHPSESSID"]
+                    val drivebotDoc = drivebotresponse.document
+                    val token = Regex("""formData\.append\('token', '([a-f0-9]+)'\)""").find(drivebotDoc.toString()) ?. groupValues ?. get(1) ?: "token"
+                    val postId = Regex("""fetch\('\/download\?id=([a-zA-Z0-9\/+]+)'""").find(drivebotDoc.toString()) ?. groupValues ?. get(1) ?: "postId"
+                
+                    val requestBody = FormBody.Builder()
+                        .add("token", token)
+                        .build()
+                
+                    val headers = mapOf(
+                        "Referer" to drivebotlink
+                    )
+                
+                    val cookies = mapOf(
+                        "PHPSESSID" to "$cookiesSSID",
+                    )
+                
+                    val response = app.post(
+                        "https://drivebot.cfd/download?id=${postId}",
+                        requestBody = requestBody,
+                        headers = headers,
+                        cookies = cookies,
+                        timeout = 60L
                     ).toString()
-                    val finalDownloadLink = downloadLink.substringAfter("url\":\"").substringBefore("\",\"name").replace("\\/", "/")
+                
+                    var downloadlink = Regex("url\":\"(.*?)\"").find(response) ?. groupValues ?. get(1) ?: ""    
+
+                    downloadlink = downloadlink.replace("\\", "")                
+                
                     callback.invoke(
                         ExtractorLink(
-                            "GDFlix[Instant Download]", "GDFlix[Instant Download] $tagQuality", finalDownloadLink, "", getQualityFromName(tags)
+                            "DriveBot", 
+                            "DriveBot $tagquality", 
+                            downloadlink, 
+                            "https://drivebot.cfd/",
+                            getQualityFromName(tags)
                         )
                     )
                 }
             }
-        }
-    }
-
-    private suspend fun handleDriveBotDownload(id: String, doId: String, tags: String, tagQuality: String, callback: (ExtractorLink) -> Unit) {
-        val indexBotLink = "https://indexbot.lol/download?id=${id}&do=${doId}"
-        handleIndexBot(indexBotLink, tags, tagQuality, callback)
-
-        val driveBotLink = "https://drivebot.cfd/download?id=${id}&do=${doId}"
-        handleDriveBot(driveBotLink, tags, tagQuality, callback)
-    }
-
-    private suspend fun handleIndexBot(indexBotLink: String, tags: String, tagQuality: String, callback: (ExtractorLink) -> Unit) {
-        val indexBotResponse = app.get(indexBotLink, timeout = 60L)
-        if (indexBotResponse.isSuccessful) {
-            val cookiesSSID = indexBotResponse.cookies["PHPSESSID"]
-            val indexBotDoc = indexBotResponse.document
-            val token = Regex("""formData\.append\('token', '([a-f0-9]+)'\)""").find(indexBotDoc.toString())?.groupValues?.get(1) ?: "token"
-            val postId = Regex("""fetch\('\/download\?id=([a-zA-Z0-9\/+]+)'""").find(indexBotDoc.toString())?.groupValues?.get(1) ?: "postId"
-
-            val requestBody = FormBody.Builder()
-                .add("token", token)
-                .build()
-
-            val headers = mapOf("Referer" to indexBotLink)
-            val cookies = mapOf("PHPSESSID" to "$cookiesSSID")
-
-            val response = app.post(
-                "https://indexbot.lol/download?id=${postId}",
-                requestBody = requestBody,
-                headers = headers,
-                cookies = cookies,
-                timeout = 60L
-            ).toString()
-
-            var downloadLink = Regex("url\":\"(.*?)\"").find(response)?.groupValues?.get(1) ?: ""
-            downloadLink = downloadLink.replace("\\", "")
-
-            callback.invoke(
-                ExtractorLink(
-                    "IndexBot", "IndexBot $tagQuality", downloadLink, "https://indexbot.lol/", getQualityFromName(tags)
+            else if (it.select("a").text().contains("Instant Download"))
+            {
+                val Instant_link=it.attr("href")
+                val token = Instant_link.substringAfter("url=")
+                val domain= getBaseUrl(Instant_link)
+                val downloadlink = app.post(
+                    url = "$domain/api",
+                    data = mapOf(
+                        "keys" to token
+                    ),
+                    referer = Instant_link,
+                    headers = mapOf(
+                        "x-token" to "direct.zencloud.lol",
+                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
+                    ),
+                    timeout = 100L,
                 )
-            )
-        }
-    }
-
-    private suspend fun handleDriveBot(driveBotLink: String, tags: String, tagQuality: String, callback: (ExtractorLink) -> Unit) {
-        val driveBotResponse = app.get(driveBotLink, timeout = 60L)
-        if (driveBotResponse.isSuccessful) {
-            val cookiesSSID = driveBotResponse.cookies["PHPSESSID"]
-            val driveBotDoc = driveBotResponse.document
-            val token = Regex("""formData\.append\('token', '([a-f0-9]+)'\)""").find(driveBotDoc.toString())?.groupValues?.get(1) ?: "token"
-            val postId = Regex("""fetch\('\/download\?id=([a-zA-Z0-9\/+]+)'""").find(driveBotDoc.toString())?.groupValues?.get(1) ?: "postId"
-
-            val requestBody = FormBody.Builder()
-                .add("token", token)
-                .build()
-
-            val headers = mapOf("Referer" to driveBotLink)
-            val cookies = mapOf("PHPSESSID" to "$cookiesSSID")
-
-            val response = app.post(
-                "https://drivebot.cfd/download?id=${postId}",
-                requestBody = requestBody,
-                headers = headers,
-                cookies = cookies,
-                timeout = 60L
-            ).toString()
-
-            var downloadLink = Regex("url\":\"(.*?)\"").find(response)?.groupValues?.get(1) ?: ""
-            downloadLink = downloadLink.replace("\\", "")
-
-            callback.invoke(
-                ExtractorLink(
-                    "DriveBot", "DriveBot $tagQuality", downloadLink, "https://drivebot.cfd/", getQualityFromName(tags)
+                val finaldownloadlink =
+                    downloadlink.toString().substringAfter("url\":\"")
+                        .substringBefore("\",\"name")
+                        .replace("\\/", "/")
+                val link = finaldownloadlink
+                callback.invoke(
+                    ExtractorLink(
+                        "GDFlix[Instant Download]",
+                        "GDFlix[Instant Download] $tagquality",
+                        url = link,
+                        "",
+                        getQualityFromName(tags)
+                    )
                 )
-            )
+            }
+            else
+            {
+                val link=it.attr("href")
+            }
         }
     }
 }
 
 class HubCloud : ExtractorApi() {
     override val name: String = "Hub-Cloud"
-    override val mainUrl: String = "https://hubcloud.lol"
+    override val mainUrl: String = "https://hubcloud.club"
     override val requiresReferer = false
 
     override suspend fun getUrl(
@@ -193,53 +223,68 @@ class HubCloud : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        val doc = app.get(url).text
-        val newLink = doc.substringAfter("url=").substringBefore("\"")
-        val newDoc = app.get(newLink).document
-        val gamerLink = if (newLink.contains("drive")) {
-            val scriptTag = newDoc.selectFirst("script:containsData(url)")?.toString()
-            scriptTag?.let { Regex("var url = '([^']*)'").find(it)?.groupValues?.get(1) } ?: ""
-        } else {
-            newDoc.selectFirst("div.vd > center > a")?.attr("href") ?: ""
+        val doc = app.get(url).document
+        var gamerLink = ""
+        if(url.contains("drive")) {
+            val scriptTag = doc.selectFirst("script:containsData(url)").toString()
+            gamerLink = Regex("var url = '([^']*)'").find(scriptTag) ?. groupValues ?. get(1) ?: ""
+        }
+        else {
+            gamerLink = doc.selectFirst("div.vd > center > a") ?. attr("href") ?: ""
         }
 
         val document = app.get(gamerLink).document
 
-        val size = document.selectFirst("i#size")?.text()
+        val size = document.selectFirst("i#size") ?. text()
         val div = document.selectFirst("div.card-body")
-        val header = document.selectFirst("div.card-header")?.text()
-        div?.select("a")?.apmap {
+        val header = document.selectFirst("div.card-header") ?. text()
+        div.select("a").amap {
             val link = it.attr("href")
-            when {
-                link.contains("pixeldra") -> {
-                    callback.invoke(
-                        ExtractorLink(
-                            "Pixeldrain", "Pixeldrain $size", link, "", getIndexQuality(header)
-                        )
+            if (link.contains("pixeldra")) {
+                callback.invoke(
+                    ExtractorLink(
+                        "Pixeldrain",
+                        "Pixeldrain $size",
+                        link,
+                        "",
+                        getIndexQuality(header),
                     )
-                }
-                link.contains("dl.php") -> {
-                    callback.invoke(
-                        ExtractorLink(
-                            "Hub-Cloud[Download]", "Hub-Cloud[Download] $size", link, "", getIndexQuality(header)
-                        )
+                )
+            }
+            else if(link.contains("dl.php")) {
+                val response = app.get(link, allowRedirects = false)
+                val downloadLink = response.headers["location"].toString().split("link=").getOrNull(1) ?: link
+                callback.invoke(
+                    ExtractorLink(
+                        "Hub-Cloud[Download]",
+                        "Hub-Cloud[Download] $size",
+                        downloadLink,
+                        "",
+                        getIndexQuality(header),
                     )
-                }
-                link.contains(".dev") -> {
-                    callback.invoke(
-                        ExtractorLink(
-                            "Hub-Cloud", "Hub-Cloud $size", link, "", getIndexQuality(header)
-                        )
+                )
+            }
+            else if(link.contains(".dev")) {
+                callback.invoke(
+                    ExtractorLink(
+                        "Hub-Cloud",
+                        "Hub-Cloud $size",
+                        link,
+                        "",
+                        getIndexQuality(header),
                     )
-                }
-                else -> {
-                    loadExtractor(link, subtitleCallback, callback)
-                }
+                )
+            }
+            else {
+                loadExtractor(link, subtitleCallback, callback)
             }
         }
     }
 
+
     private fun getIndexQuality(str: String?): Int {
-        return Regex("(\\d{3,4})[pP]").find(str ?: "")?.groupValues?.getOrNull(1)?.toIntOrNull() ?: Qualities.Unknown.value
+        return Regex("(\\d{3,4})[pP]").find(str ?: "") ?. groupValues ?. getOrNull(1) ?. toIntOrNull()
+            ?: Qualities.Unknown.value
     }
+
 }
