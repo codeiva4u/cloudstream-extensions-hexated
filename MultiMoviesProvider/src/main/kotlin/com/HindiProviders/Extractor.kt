@@ -31,10 +31,10 @@ class server2 : VidhideExtractor() {
     override var mainUrl = "https://server2.shop"
 }
 
-// class Asnwish : VidhideExtractor() {
-//     override var name = "Multimovies Vidhide"
-//     override var mainUrl = "https://asnwish.com"
-// }
+class Asnwish : VidhideExtractor() {
+    override var name = "Multimovies Vidhide"
+    override var mainUrl = "https://asnwish.com"
+}
 
 open class GDMirrorbot : ExtractorApi() {
     override var name = "GDMirrorbot"
