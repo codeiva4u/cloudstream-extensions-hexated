@@ -5,7 +5,7 @@ import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
-open class MoviesDriveProvider : MainAPI() { // all providers must be an instance of MainAPI
+class MoviesDriveProvider : MainAPI() { // all providers must be an instance of MainAPI
     override var mainUrl = "https://moviesdrive.website"
     override var name = "MoviesDrive"
     override val hasMainPage = true
@@ -27,7 +27,7 @@ open class MoviesDriveProvider : MainAPI() { // all providers must be an instanc
         
     )
 
-    override suspend fun getMainPage(
+     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
@@ -39,8 +39,8 @@ open class MoviesDriveProvider : MainAPI() { // all providers must be an instanc
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val titleElement = this.selectFirst("figure > img")
-        val trimTitle = titleElement?.attr("title")?.let {
+        val title = this.selectFirst("figure > img") ?. attr("title")
+        val trimTitle = title ?. let {
             if (it.contains("Download ")) {
                 it.replace("Download ", "")
             } else {
@@ -48,9 +48,9 @@ open class MoviesDriveProvider : MainAPI() { // all providers must be an instanc
             }
         } ?: ""
 
-        val href = fixUrl(this.selectFirst("figure > a")?.attr("href").toString())
-        val posterUrl = fixUrlNull(titleElement?.attr("src").toString())
-
+        val href = fixUrl(this.selectFirst("figure > a") ?. attr("href").toString())
+        val posterUrl = fixUrlNull(this.selectFirst("figure > img") ?. attr("src").toString())
+    
         return newMovieSearchResponse(trimTitle, href, TvType.Movie) {
             this.posterUrl = posterUrl
         }
@@ -75,8 +75,8 @@ open class MoviesDriveProvider : MainAPI() { // all providers must be an instanc
 
     override suspend fun load(url: String): LoadResponse? {
         val document = app.get(url).document
-        val ogTitle = document.selectFirst("meta[property=og:title]")?.attr("content")
-        val trimTitle = ogTitle?.let {
+        val title = document.selectFirst("meta[property=og:title]") ?. attr("content")
+        val trimTitle = title ?.let {
             if (it.contains("Download ")) {
                 it.replace("Download ", "")
             } else {
@@ -84,82 +84,111 @@ open class MoviesDriveProvider : MainAPI() { // all providers must be an instanc
             }
         } ?: ""
 
-        val posterUrl = document.selectFirst("img[decoding=\"async\"]")?.attr("src") ?: ""
+        val plotElement = document.select(
+            "h2:contains(Storyline), h3:contains(Storyline), h5:contains(Storyline), h4:contains(Storyline), h4:contains(STORYLINE)"
+        ).firstOrNull() ?. nextElementSibling()
+
+        val plot = plotElement ?. text() ?: document.select(".ipc-html-content-inner-div").firstOrNull() ?. text() ?: ""
+
+        val posterUrl = document.selectFirst("img[decoding=\"async\"]") ?. attr("src") ?: ""
         val seasonRegex = """(?i)season\s*\d+""".toRegex()
         val tvType = if (
-            ogTitle?.contains("Episode", ignoreCase = true) == true ||
-            seasonRegex.containsMatchIn(ogTitle ?: "") ||
-            ogTitle?.contains("series", ignoreCase = true) == true
-        ) {
+            title ?. contains("Episode", ignoreCase = true) ?: false || 
+            seasonRegex.containsMatchIn(title ?: "") || 
+            title ?. contains("series", ignoreCase = true) ?: false
+        ) { 
             TvType.TvSeries
         } else {
             TvType.Movie
         }
-
-        return if (tvType == TvType.TvSeries) {
+        if(tvType == TvType.TvSeries) {
             val tvSeriesEpisodes = mutableListOf<Episode>()
-            val buttons = document.select("h5 > a")
+            var buttons = document.select("h5 > a")
                 .filter { element -> !element.text().contains("Zip", true) }
 
-            if (buttons.isNotEmpty()) {
+            if(buttons.isNotEmpty()) {
+                val seasonList = mutableListOf<Pair<String, Int>>()
                 var seasonNum = 1
                 buttons.forEach { button ->
-                    val titleElement = button.parent()?.previousElementSibling()
-                    val mainTitle = titleElement?.text() ?: ""
+                    val titleElement = button.parent() ?. previousElementSibling()
+                    val mainTitle = titleElement ?. text() ?: ""
+                    val realSeasonRegex = Regex("""(?:Season |S)(\d+)""")
+                    val realSeason = realSeasonRegex.find(mainTitle.toString()) ?. groupValues ?. get(1) ?: " Unknown"
+                    val qualityRegex = """(1080p|720p|480p|2160p|4K|[0-9]*0p)""".toRegex(RegexOption.IGNORE_CASE)
+                    val quality = qualityRegex.find(mainTitle.toString()) ?. groupValues ?. get(1) ?: " Unknown"
+                    val sizeRegex = Regex("""\b\d+(?:\.\d+)?(?:MB|GB)\b""")
+                    val size = sizeRegex.find(mainTitle.toString())?.value ?: ""
+                    seasonList.add("S$realSeason $quality $size" to seasonNum)
                     val episodeLink = button.attr("href") ?: ""
 
                     val doc = app.get(episodeLink).document
 
-                    val elements = doc.select("span:matches((?i)(Ep))").ifEmpty {
-                        doc.select("a:matches((?i)(HubCloud))")
+                    var elements = doc.select("span:matches((?i)(Ep))")
+                    if(elements.isEmpty()) {
+                        elements = doc.select("a:matches((?i)(HubCloud))")
                     }
-                    val episodes = elements.mapIndexed { index, element ->
-                        val episodeString = if (element.tagName() == "span") {
+                    val episodes = mutableListOf<Episode>()
+                    elements.forEach { element ->
+                        var episodeString = ""
+                        var title = mainTitle
+                        if(element.tagName() == "span") {
                             val titleTag = element.parent()
-                            titleTag?.text() ?: ""
-                            var linkTag = titleTag?.nextElementSibling()
-                            var episodeString = ""
-                            while (linkTag != null && linkTag.text().contains("HubCloud", ignoreCase = true)) {
+                            title = titleTag ?. text() ?: ""
+                            var linkTag = titleTag ?. nextElementSibling()
+
+                            while(linkTag != null && (linkTag.text() ?. contains("HubCloud", ignoreCase = true) ?: false)) {
                                 episodeString += linkTag.toString()
                                 linkTag = linkTag.nextElementSibling()
                             }
-                            episodeString
-                        } else {
-                            element.toString()
+                        }
+                        else {
+                            episodeString = element.toString()
                         }
 
-                        Episode(
-                            name = "$mainTitle",
-                            data = episodeString,
-                            season = seasonNum,
-                            episode = index + 1
-                        )
+                        if (episodeString.isNotEmpty()) {
+                            episodes.add(
+                                Episode(
+                                    name = "$title",
+                                    data = episodeString,
+                                    season = seasonNum,
+                                    episode = elements.indexOf(element) + 1
+                                )
+                            )
+                        }
                     }
                     tvSeriesEpisodes.addAll(episodes)
                     seasonNum++
                 }
-                newTvSeriesLoadResponse(trimTitle, url, TvType.TvSeries, tvSeriesEpisodes) {
+                return newTvSeriesLoadResponse(trimTitle, url, TvType.TvSeries, tvSeriesEpisodes) {
                     this.posterUrl = posterUrl
-                }
-            } else {
-                val episodesList = document.select("p.p1").mapNotNull { pTag ->
-                    val text = pTag.text() ?: ""
-                    val nextTag = pTag.nextElementSibling()
-                    val nextTagString = nextTag?.toString()
-                    nextTagString?.let {
-                        Episode(
-                            name = text,
-                            data = it,
-                        )
-                    }
-                }
-                newTvSeriesLoadResponse(trimTitle, url, TvType.TvSeries, episodesList) {
-                    this.posterUrl = posterUrl
+                    this.plot = plot
+                    this.seasonNames = seasonList.map {(name, int) -> SeasonData(int, name)}
                 }
             }
-        } else {
-            newMovieLoadResponse(trimTitle, url, TvType.Movie, url) {
+            else {
+                val episodesList = mutableListOf<Episode>()
+                val pTags = document.select("p.p1")
+                pTags.forEach { pTag ->
+                    val text = pTag.text() ?: ""
+                    val nextTag = pTag.nextElementSibling()
+                    val nextTagString = nextTag ?. toString() ?: ""
+                    val episodes = Episode(
+                        name = text,
+                        data = nextTagString,
+                    )
+                    episodesList.add(episodes)
+                }
+                return newTvSeriesLoadResponse(trimTitle, url, TvType.TvSeries, episodesList) {
+                    this.posterUrl = posterUrl
+                    this.plot = plot
+                }
+            }
+
+        }
+        else {
+            return newMovieLoadResponse(trimTitle, url, TvType.Movie, url) {
                 this.posterUrl = posterUrl
+                this.plot = plot
             }
         }
     }
@@ -170,33 +199,37 @@ open class MoviesDriveProvider : MainAPI() { // all providers must be an instanc
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        if (data.contains("graph.")) {
+        if(data.contains("graph.")) {
             val regex = Regex("""(?i)https?:\/\/[^\s"<]+""")
             val links = regex.findAll(data).mapNotNull { it.value }.toList()
-            links.forEach { link ->
-                val doc = app.get(link).document
-                doc.select("h3 > a").forEach {
+            links.amap {
+                val doc = app.get(it).document
+                doc.select("h3 > a").mapNotNull {
                     val src = it.attr("href")
                     loadExtractor(src, subtitleCallback, callback)
                 }
             }
-        } else if (data.contains("moviesdrive")) {
+        }
+        else if(data.contains("moviesdrive")) {
             val document = app.get(data).document
-            document.select("h5 > a").forEach { button ->
+            val buttons = document.select("h5 > a")
+            buttons.amap { button ->
                 val link = button.attr("href")
                 val doc = app.get(link).document
-                doc.select("h5 > a").forEach { innerButton ->
+                val innerButtons = doc.select("h5 > a")
+                innerButtons.amap { innerButton ->
                     val source = innerButton.attr("href")
                     loadExtractor(source, subtitleCallback, callback)
                 }
             }
-        } else {
+        }
+        else {
             val hubCloudRegex = Regex("""(?i)https?:\/\/[^\s"<]+""")
-            val hubCloudLinks = hubCloudRegex.findAll(data).mapNotNull { it.value }.toList()
-            hubCloudLinks.forEach { link ->
+            var hubCloudLinks = hubCloudRegex.findAll(data).mapNotNull { it.value }.toList()
+            hubCloudLinks.amap { link ->
                 loadExtractor(link, subtitleCallback, callback)
             }
         }
-        return true
+        return true   
     }
 }
