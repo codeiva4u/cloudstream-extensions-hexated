@@ -6,6 +6,7 @@ import android.content.Context
 import com.lagradost.cloudstream3.extractors.DoodLaExtractor
 import com.lagradost.cloudstream3.extractors.MixDrop
 import com.lagradost.cloudstream3.extractors.XStreamCdn
+import com.lagradost.cloudstream3.extractors.Chillx
 
 @CloudstreamPlugin
 class MultiMoviesProviderPlugin: Plugin() {
@@ -19,6 +20,7 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Animezia())
         registerExtractorAPI(server2())
         registerExtractorAPI(Asnwish())
+        registerExtractorAPI(Chillx())
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(GDMirrorbot()) 
     }
