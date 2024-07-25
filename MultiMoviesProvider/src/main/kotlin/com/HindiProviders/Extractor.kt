@@ -1,12 +1,15 @@
 package com.HindiProviders
 
-import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
 import com.lagradost.cloudstream3.extractors.VidhideExtractor
+import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.getQualityFromName
+import com.lagradost.cloudstream3.utils.INFER_TYPE
+import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.SubtitleFile
+
 
 class Multimovies : StreamWishExtractor() {
     override var name = "Multimovies Cloud"
@@ -28,39 +31,18 @@ class server2 : VidhideExtractor() {
     override var mainUrl = "https://server2.shop"
 }
 
-
-class Gogoanime : ExtractorApi() {
-    override var name = "GogoAnime"
-    override val mainUrl = "https://gogoanime.website"
+open class GDMirrorbot : ExtractorApi() {
+    override var name = "GDMirrorbot"
+    override var mainUrl = "https://gdmirrorbot.nl"
     override val requiresReferer = false
-
     override suspend fun getUrl(
         url: String,
         referer: String?,
         subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ) {
-        val doc = app.get(
-            url,
-            referer = referer,
-            allowRedirects = false
-        ).document
-
-        val videoElement = doc.select("video.jw-video").first()
-        val videoUrl = videoElement?.attr("src")
-
-        if (!videoUrl.isNullOrBlank()) {
-            callback(
-                ExtractorLink(
-                    this.name,
-                    this.name,
-                    videoUrl,
-                    referer ?: "$mainUrl/",
-                    getQualityFromName(""),
-                    videoUrl.contains("m3u8")
-                )
-            )
+        callback: (ExtractorLink) -> Unit) {
+        app.get(url).document.select("ul#videoLinks li").map {
+            val link=it.attr("data-link")
+            loadExtractor(link,subtitleCallback, callback)
         }
     }
 }
-   
