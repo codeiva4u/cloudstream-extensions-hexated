@@ -21,6 +21,10 @@ class MultimoviesAIO: StreamWishExtractor() {
     override var mainUrl = "https://allinonedownloader.fun"
 }
 
+class Asnwish : StreamWishExtractor() {
+    override var name = "Multimovies StreamWish Asnwish"
+    override var mainUrl = "https://gdmirrorbot.nl"
+}
 class Animezia : VidhideExtractor() {
     override var name = "Animezia"
     override var mainUrl = "https://animezia.cloud"
@@ -29,11 +33,6 @@ class Animezia : VidhideExtractor() {
 class Server2 : VidhideExtractor() {
     override var name = "Multimovies Vidhide"
     override var mainUrl = "https://server2.shop"
-}
-
-class Asnwish : StreamWishExtractor() {
-    override var name = "Multimovies StreamWish Asnwish"
-    override var mainUrl = "https://asnwish.com"
 }
 
 open class GDMirrorbot : ExtractorApi() {
