@@ -23,7 +23,7 @@ class MultimoviesAIO: StreamWishExtractor() {
 
 class Asnwish : StreamWishExtractor() {
     override var name = "Multimovies StreamWish Asnwish"
-    override var mainUrl = "https://cdnwish.com"
+    override var mainUrl = "https://snapinsta.storyy.shop"
 }
 class Animezia : VidhideExtractor() {
     override var name = "Animezia"
