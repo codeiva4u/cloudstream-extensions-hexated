@@ -27,7 +27,7 @@ class Asnwish : StreamWishExtractor() {
     override var mainUrl = "https://cdnwish.com"
 }
 
-class Filesim : FilesimExtractor() {
+class Filesim : Filesim() {
     override var name = "Multimovies StreamWish Filesim Asnwish"
     override var mainUrl = "https://asnwish.com"
 }
