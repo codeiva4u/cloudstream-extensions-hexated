@@ -31,7 +31,7 @@ class server2 : VidhideExtractor() {
     override var mainUrl = "https://server2.shop"
 }
 
-// class asnwish : VidhideExtractor() {
+// class Asnwish : VidhideExtractor() {
 //     override var name = "Multimovies Vidhide"
 //     override var mainUrl = "https://asnwish.com"
 // }
