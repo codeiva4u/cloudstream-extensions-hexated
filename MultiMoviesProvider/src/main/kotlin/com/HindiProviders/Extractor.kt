@@ -32,7 +32,7 @@ class Server2 : VidhideExtractor() {
 }
 
 class Asnwish : VidhideExtractor() {
-    override var name = "Multimovies Vidhide"
+    override var name = "Multimovies Vidhide Asnwish"
     override var mainUrl = "https://asnwish.com"
 }
 
