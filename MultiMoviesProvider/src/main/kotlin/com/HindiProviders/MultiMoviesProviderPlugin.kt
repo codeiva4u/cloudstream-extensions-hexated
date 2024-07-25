@@ -7,7 +7,6 @@ import com.lagradost.cloudstream3.extractors.DoodLaExtractor
 import com.lagradost.cloudstream3.extractors.MixDrop
 import com.lagradost.cloudstream3.extractors.XStreamCdn
 import com.lagradost.cloudstream3.extractors.Chillx
-import com.lagradost.cloudstream3.extractors.Filesim
 
 @CloudstreamPlugin
 class MultiMoviesProviderPlugin: Plugin() {
@@ -22,7 +21,6 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Server2())
         registerExtractorAPI(Asnwish())
         registerExtractorAPI(Chillx())
-        registerExtractorAPI(Filesim())
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(GDMirrorbot()) 
     }
