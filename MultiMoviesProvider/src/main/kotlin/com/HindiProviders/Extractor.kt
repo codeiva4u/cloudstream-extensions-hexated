@@ -22,14 +22,9 @@ class MultimoviesAIO: StreamWishExtractor() {
     override var mainUrl = "https://allinonedownloader.fun"
 }
 
-class Asnwish : StreamWishExtractor() {
-    override var name = "Multimovies StreamWish Asnwish"
+class CdnwishCom : StreamWishExtractor() {
+    override var name = "Multimovies StreamWish CdnwishCom"
     override var mainUrl = "https://cdnwish.com"
-}
-
-class Filesim : Filesim() {
-    override var name = "Multimovies StreamWish Filesim Asnwish"
-    override var mainUrl = "https://asnwish.com"
 }
 
 class Animezia : VidhideExtractor() {
