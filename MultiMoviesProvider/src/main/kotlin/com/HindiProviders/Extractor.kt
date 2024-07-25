@@ -2,6 +2,7 @@ package com.HindiProviders
 
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
 import com.lagradost.cloudstream3.extractors.VidhideExtractor
+import com.lagradost.cloudstream3.extractors.Filesim
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -25,6 +26,12 @@ class Asnwish : StreamWishExtractor() {
     override var name = "Multimovies StreamWish Asnwish"
     override var mainUrl = "https://cdnwish.com"
 }
+
+class Filesim : FilesimExtractor() {
+    override var name = "Multimovies StreamWish Filesim Asnwish"
+    override var mainUrl = "https://asnwish.com"
+}
+
 class Animezia : VidhideExtractor() {
     override var name = "Animezia"
     override var mainUrl = "https://animezia.cloud"
