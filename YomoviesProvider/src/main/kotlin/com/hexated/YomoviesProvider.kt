@@ -27,7 +27,7 @@ import org.jsoup.nodes.Element
 
 open class YomoviesProvider : MainAPI() {
 
-    override var mainUrl = "https://yomovies.farm/"
+    override var mainUrl = "https://prmovies.chat/"
     override var name = "Yomovies"
     override val hasMainPage = true
     override var lang = "hi"
