@@ -27,7 +27,7 @@ import org.jsoup.nodes.Element
 
 open class PrmoviesProvider : MainAPI() {
 
-    override var mainUrl = "https://prmovies.food/"
+    override var mainUrl = "https://prmovies.chat"
     override var name = "Prmovies"
     override val hasMainPage = true
     override var lang = "hi"
