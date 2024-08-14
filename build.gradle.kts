@@ -40,13 +40,13 @@ subprojects {
     android {
 
         defaultConfig {
-            minSdk = 21
+            minSdk = 28
             compileSdkVersion(33)
             targetSdk = 33
         }
 
         compileOptions {
-            isCoreLibraryDesugaringEnabled = true
+        //    isCoreLibraryDesugaringEnabled = true
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8
         }
