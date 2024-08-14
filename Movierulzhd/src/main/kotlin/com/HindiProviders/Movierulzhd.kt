@@ -24,14 +24,18 @@ open class Movierulzhd : MainAPI() {
     )
 
     override val mainPage = mainPageOf(
-        "trending" to "Trending",
-        "movies" to "Movies",
-        "tvshows" to "TV Shows",
+        "movies" to "New Release",
+        "genre/hindi-dubbed" to "Hindi Dubbed Movies",
+        "genre/hindi" to "Hindi Movies",
+        "genre/hindi-dubbed-web-series" to "Hindi Dubbed Web Series",
+        "hindi-web-series-download" to "Hindi Web Series",
         "genre/netflix" to "Netflix",
         "genre/amazon-prime" to "Amazon Prime",
+        "genre/hotstar" to "Hotstar",
         "genre/Zee5" to "Zee5",
-        "seasons" to "Season",
-        "episodes" to "Episode",
+        "genre/jio-cinema" to "Jio Cinema",
+        "genre/voot" to "Voot Original",
+        "genre/sony-liv" to "Sony LIV",
     )
 
     override suspend fun getMainPage(
