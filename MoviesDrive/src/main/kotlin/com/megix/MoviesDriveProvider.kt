@@ -28,7 +28,7 @@ class MoviesDriveProvider : MainAPI() {
         "$mainUrl/category/hotstar/page/" to "Hotstar",
     )
 
-    override suspend fun getMainPage(
+     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
