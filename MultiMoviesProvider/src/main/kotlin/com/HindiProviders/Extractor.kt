@@ -9,6 +9,9 @@ import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.network.WebViewResolver
+import com.lagradost.cloudstream3.utils.M3u8Helper
+import com.lagradost.cloudstream3.utils.getAndUnpack
+import com.lagradost.cloudstream3.utils.getPacked
 
 class MultimoviesAIO : StreamWishExtractor() {
     override var name = "Multimovies Cloud AIO"
@@ -79,7 +82,7 @@ open class VidhideExtractor : ExtractorApi() {
 }
 
 class Asnwish : StreamWishExtractor() {
-    override val name = "Asnwish"
+    override var name = "Asnwish"
     override val mainUrl = "https://asnwish.com"
     override val requiresReferer = true
 
