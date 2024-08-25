@@ -1,11 +1,13 @@
 package com.HindiProviders
 
+import android.util.Log
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
 import com.lagradost.cloudstream3.network.WebViewResolver
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.Jsoup
@@ -83,18 +85,23 @@ class AsnWish : ExtractorApi() {
     override var mainUrl = "https://asnwish.com"
     override val requiresReferer = false
 
-   override suspend fun getUrl(
+    override suspend fun getUrl(
         url: String,
         referer: String?,
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
         val res = app.get(url, referer = referer).document
-        val mappers = res.selectFirst("script:containsData(sniff\\()")?.data()?.substringAfter("sniff(")
-            ?.substringBefore(");") ?: return
+        val mappers =
+            res.selectFirst("script:containsData(sniff\\()")?.data()?.substringAfter("sniff(")
+                ?.substringBefore(");") ?: return
         val ids = mappers.split(",").map { it.replace("\"", "") }
-        Log.d("Phisher",url)
-        val header= mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0","Accept" to "*/*","Referer" to url)
+        Log.d("Phisher", url)
+        val header = mapOf(
+            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0",
+            "Accept" to "*/*",
+            "Referer" to url
+        )
         callback.invoke(
             ExtractorLink(
                 this.name,
@@ -107,3 +114,4 @@ class AsnWish : ExtractorApi() {
             )
         )
     }
+}
