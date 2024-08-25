@@ -34,9 +34,9 @@ class server2 : VidhideExtractor() {
     override var requiresReferer = true
 }
 
-class VidhidePro : VidhideExtractor() {
-    override var name = "Multimovies VidhidePro"
-    override var mainUrl = "https://server2.shop"
+class VidhideVip : VidhideExtractor() {
+    override var name = "Multimovies VidhideVip"
+    override var mainUrl = "vidhidevip.com"
     override var requiresReferer = true
 }
 

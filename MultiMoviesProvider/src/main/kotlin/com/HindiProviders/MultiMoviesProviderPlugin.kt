@@ -1,12 +1,13 @@
 package com.HindiProviders
 
-import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
-import com.lagradost.cloudstream3.plugins.Plugin
 import android.content.Context
+import com.lagradost.cloudstream3.extractors.Chillx
 import com.lagradost.cloudstream3.extractors.DoodLaExtractor
 import com.lagradost.cloudstream3.extractors.MixDrop
+import com.lagradost.cloudstream3.extractors.StreamTape
 import com.lagradost.cloudstream3.extractors.XStreamCdn
-import com.lagradost.cloudstream3.extractors.CdnwishCom
+import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
+import com.lagradost.cloudstream3.plugins.Plugin
 
 @CloudstreamPlugin
 class MultiMoviesProviderPlugin: Plugin() {
@@ -17,13 +18,15 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Multimovies())
         registerExtractorAPI(XStreamCdn())
         registerExtractorAPI(DoodLaExtractor())
+        registerExtractorAPI(StreamTape())
+        registerExtractorAPI(Chillx())
         registerExtractorAPI(Animezia())
         registerExtractorAPI(server2())
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(GDMirrorbot())
         registerExtractorAPI(VidhideExtractor())
-        registerExtractorAPI(CdnwishCom())
-        registerExtractorAPI(VidhidePro())
+        registerExtractorAPI(VidhideVip())
+
 
     }
 }
