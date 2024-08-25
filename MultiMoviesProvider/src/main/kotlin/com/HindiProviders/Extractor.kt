@@ -83,36 +83,28 @@ class AsnWish : ExtractorApi() {
     override var mainUrl = "https://asnwish.com"
     override val requiresReferer = false
 
-    override suspend fun getUrl(
+   override suspend fun getUrl(
         url: String,
         referer: String?,
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        // Make a request to load the web page
-        val response = app.get(url, referer = referer ?: "$mainUrl/")
-
-        // Parse the HTML page
-        val document: Document = Jsoup.parse(response.text)
-
-        // Logic to extract the video URL
-        val videoElement = document.select("video").first()
-        val videoUrl = videoElement?.attr("src")
-
-        if (videoUrl != null && videoUrl.isNotEmpty()) {
-            callback(
-                ExtractorLink(
-                    source = name,
-                    name = name,
-                    url = videoUrl,
-                    referer = referer ?: "$mainUrl/",
-                    quality = Qualities.Unknown.value,
-                    isM3u8 = videoUrl.contains("m3u8")
-                )
+        val res = app.get(url, referer = referer).document
+        val mappers = res.selectFirst("script:containsData(sniff\\()")?.data()?.substringAfter("sniff(")
+            ?.substringBefore(");") ?: return
+        val ids = mappers.split(",").map { it.replace("\"", "") }
+        Log.d("Phisher",url)
+        val header= mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0","Accept" to "*/*","Referer" to url)
+        callback.invoke(
+            ExtractorLink(
+                this.name,
+                this.name,
+                "$mainUrl/m3u8/${ids[1]}/${ids[2]}/master.txt?s=1&cache=1",
+                url,
+                Qualities.Unknown.value,
+                type = ExtractorLinkType.M3U8,
+                headers = header
             )
-        } else {
-            // Log an error if the video URL is not found
-            println("Video URL not found")
-        }
+        )
     }
 }
