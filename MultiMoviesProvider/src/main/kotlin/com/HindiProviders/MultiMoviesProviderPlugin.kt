@@ -18,11 +18,12 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(XStreamCdn())
         registerExtractorAPI(DoodLaExtractor())
         registerExtractorAPI(Animezia())
+         registerExtractorAPI(Asnwish())
         registerExtractorAPI(server2())
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(GDMirrorbot())
         registerExtractorAPI(VidhideExtractor())
         registerExtractorAPI(CdnwishCom())
-        
+
     }
 }
