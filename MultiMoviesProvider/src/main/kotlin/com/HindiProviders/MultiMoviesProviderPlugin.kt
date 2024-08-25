@@ -23,6 +23,7 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(GDMirrorbot())
         registerExtractorAPI(VidhideExtractor())
         registerExtractorAPI(CdnwishCom())
+        registerExtractorAPI(AsnWishExtractor())
 
     }
 }
