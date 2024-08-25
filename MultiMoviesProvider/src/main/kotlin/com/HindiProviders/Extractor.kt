@@ -78,7 +78,7 @@ open class VidhideExtractor : ExtractorApi() {
     }
 }
 
-class AsnWishExtractor : ExtractorApi() {
+class AsnWish : ExtractorApi() {
     override var name = "AsnWish"
     override var mainUrl = "https://asnwish.com"
     override val requiresReferer = false
