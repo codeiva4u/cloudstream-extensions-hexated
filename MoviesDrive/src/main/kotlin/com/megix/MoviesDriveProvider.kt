@@ -28,7 +28,7 @@ class MoviesDriveProvider : MainAPI() {
         "$mainUrl/category/hotstar/page/" to "Hotstar",
     )
 
-     override suspend fun getMainPage(
+    override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
@@ -40,10 +40,10 @@ class MoviesDriveProvider : MainAPI() {
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title = this.selectFirst("figure > img").attr("title").replace("Download ", "")
-        val href = fixUrl(this.selectFirst("figure > a") ?. attr("href").toString())
-        val posterUrl = fixUrlNull(this.selectFirst("figure > img") ?. attr("src").toString())
-    
+        val title = this.selectFirst("figure > img")?.attr("title")?.replace("Download ", "") ?: return null
+        val href = fixUrl(this.selectFirst("figure > a")?.attr("href") ?: return null)
+        val posterUrl = fixUrlNull(this.selectFirst("figure > img")?.attr("src"))
+
         return newMovieSearchResponse(title, href, TvType.Movie) {
             this.posterUrl = posterUrl
         }
@@ -68,75 +68,72 @@ class MoviesDriveProvider : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse? {
         val document = app.get(url).document
-        val title = document.selectFirst("meta[property=og:title]").attr("content").replace("Download ", "")
+        val title = document.selectFirst("meta[property=og:title]")?.attr("content")?.replace("Download ", "") ?: return null
 
         val plotElement = document.select(
             "h2:contains(Storyline), h3:contains(Storyline), h5:contains(Storyline), h4:contains(Storyline), h4:contains(STORYLINE)"
-        ).firstOrNull() ?. nextElementSibling()
+        ).firstOrNull()?.nextElementSibling()
 
-        val plot = plotElement ?. text() ?: document.select(".ipc-html-content-inner-div").firstOrNull() ?. text() ?: ""
+        val plot = plotElement?.text() ?: document.select(".ipc-html-content-inner-div").firstOrNull()?.text() ?: ""
 
-        val posterUrl = document.selectFirst("img[decoding=\"async\"]") ?. attr("src") ?: ""
+        val posterUrl = document.selectFirst("img[decoding=\"async\"]")?.attr("src") ?: ""
         val seasonRegex = """(?i)season\s*\d+""".toRegex()
-        val imdbId = document.selectFirst("a:contains(IMDb)") ?. attr("href")
+        val imdbId = document.selectFirst("a:contains(IMDb)")?.attr("href")
 
-        val tvType = if (
-            title ?. contains("Episode", ignoreCase = true) ?: false || 
-            seasonRegex.containsMatchIn(title ?: "") || 
-            title ?. contains("series", ignoreCase = true) ?: false
-        ) { 
-            TvType.TvSeries
-        } else {
-            TvType.Movie
+        val tvType = when {
+            title.contains("Episode", ignoreCase = true) -> TvType.TvSeries
+            seasonRegex.containsMatchIn(title) -> TvType.TvSeries
+            title.contains("series", ignoreCase = true) -> TvType.TvSeries
+            else -> TvType.Movie
         }
-        if(tvType == TvType.TvSeries) {
+
+        if (tvType == TvType.TvSeries) {
             val tvSeriesEpisodes = mutableListOf<Episode>()
-            var buttons = document.select("h5 > a")
+            val buttons = document.select("h5 > a")
                 .filter { element -> !element.text().contains("Zip", true) }
 
-            if(buttons.isNotEmpty()) {
+            if (buttons.isNotEmpty()) {
                 val seasonList = mutableListOf<Pair<String, Int>>()
                 var seasonNum = 1
                 buttons.forEach { button ->
-                    val titleElement = button.parent() ?. previousElementSibling()
-                    val mainTitle = titleElement ?. text() ?: ""
+                    val titleElement = button.parent()?.previousElementSibling()
+                    val mainTitle = titleElement?.text() ?: ""
                     val realSeasonRegex = Regex("""(?:Season |S)(\d+)""")
-                    val realSeason = realSeasonRegex.find(mainTitle.toString()) ?. groupValues ?. get(1) ?: " Unknown"
+                    val realSeason = realSeasonRegex.find(mainTitle)?.groupValues?.get(1) ?: "Unknown"
                     val qualityRegex = """(1080p|720p|480p|2160p|4K|[0-9]*0p)""".toRegex(RegexOption.IGNORE_CASE)
-                    val quality = qualityRegex.find(mainTitle.toString()) ?. groupValues ?. get(1) ?: " Unknown"
+                    val quality = qualityRegex.find(mainTitle)?.groupValues?.get(1) ?: "Unknown"
                     val sizeRegex = Regex("""\b\d+(?:\.\d+)?(?:MB|GB)\b""")
-                    val size = sizeRegex.find(mainTitle.toString())?.value ?: ""
+                    val size = sizeRegex.find(mainTitle)?.value ?: ""
                     seasonList.add("S$realSeason $quality $size" to seasonNum)
                     val episodeLink = button.attr("href") ?: ""
 
                     val doc = app.get(episodeLink).document
                     var elements = doc.select("span:matches((?i)(Ep))")
-                    if(elements.isEmpty()) {
+                    if (elements.isEmpty()) {
                         elements = doc.select("a:matches((?i)(HubCloud))")
                     }
                     val episodes = mutableListOf<Episode>()
-                    
+
                     elements.forEach { element ->
                         var episodeString = ""
-                        var title = mainTitle
-                        if(element.tagName() == "span") {
+                        var episodeTitle = mainTitle
+                        if (element.tagName() == "span") {
                             val titleTag = element.parent()
-                            title = titleTag ?. text() ?: ""
-                            var linkTag = titleTag ?. nextElementSibling()
+                            episodeTitle = titleTag?.text() ?: ""
+                            var linkTag = titleTag?.nextElementSibling()
 
-                            while(linkTag != null && (linkTag.text() ?. contains("HubCloud", ignoreCase = true) ?: false)) {
+                            while (linkTag != null && linkTag.text().contains("HubCloud", ignoreCase = true)) {
                                 episodeString += linkTag.toString()
                                 linkTag = linkTag.nextElementSibling()
                             }
-                        }
-                        else {
+                        } else {
                             episodeString = element.toString()
                         }
 
                         if (episodeString.isNotEmpty()) {
                             episodes.add(
-                                newEpisode(episodeString,initializer = {
-                                    name = "$title"
+                                newEpisode(episodeString, initializer = {
+                                    name = "$episodeTitle"
                                     season = seasonNum
                                     episode = elements.indexOf(element) + 1
                                 }, fix = false)
@@ -149,17 +146,16 @@ class MoviesDriveProvider : MainAPI() {
                 return newTvSeriesLoadResponse(title, url, TvType.TvSeries, tvSeriesEpisodes) {
                     this.posterUrl = posterUrl
                     this.plot = plot
-                    this.seasonNames = seasonList.map {(name, int) -> SeasonData(int, name)}
+                    this.seasonNames = seasonList.map { (name, int) -> SeasonData(int, name) }
                     addImdbUrl(imdbId)
                 }
-            }
-            else {
+            } else {
                 val episodesList = mutableListOf<Episode>()
                 val pTags = document.select("p.p1")
                 pTags.forEach { pTag ->
                     val text = pTag.text() ?: ""
                     val nextTag = pTag.nextElementSibling()
-                    val nextTagString = nextTag ?. toString() ?: ""
+                    val nextTagString = nextTag?.toString() ?: ""
                     val episodes = newEpisode(nextTagString, initializer = {
                         name = text
                     }, fix = false)
@@ -172,8 +168,7 @@ class MoviesDriveProvider : MainAPI() {
                 }
             }
 
-        }
-        else {
+        } else {
             return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = posterUrl
                 this.plot = plot
@@ -188,7 +183,7 @@ class MoviesDriveProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        if(data.contains("graph.")) {
+        if (data.contains("graph.")) {
             val regex = Regex("""(?i)https?:\/\/[^\s"<]+""")
             val links = regex.findAll(data).mapNotNull { it.value }.toList()
             links.amap {
@@ -198,8 +193,7 @@ class MoviesDriveProvider : MainAPI() {
                     loadExtractor(src, subtitleCallback, callback)
                 }
             }
-        }
-        else if(data.contains("moviesdrive")) {
+        } else if (data.contains("moviesdrive")) {
             val document = app.get(data).document
             val buttons = document.select("h5 > a")
             buttons.amap { button ->
@@ -211,14 +205,13 @@ class MoviesDriveProvider : MainAPI() {
                     loadExtractor(source, subtitleCallback, callback)
                 }
             }
-        }
-        else {
+        } else {
             val hubCloudRegex = Regex("""(?i)https?:\/\/[^\s"<]+""")
-            var hubCloudLinks = hubCloudRegex.findAll(data).mapNotNull { it.value }.toList()
+            val hubCloudLinks = hubCloudRegex.findAll(data).mapNotNull { it.value }.toList()
             hubCloudLinks.amap { link ->
                 loadExtractor(link, subtitleCallback, callback)
             }
         }
-        return true   
+        return true
     }
 }
