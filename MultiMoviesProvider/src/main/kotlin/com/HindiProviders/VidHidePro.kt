@@ -3,53 +3,83 @@ package com.HindiProviders
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.USER_AGENT
 import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.extractors.StreamWishExtractor
+import com.lagradost.cloudstream3.network.WebViewResolver
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.M3u8Helper.Companion.generateM3u8
+import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.getAndUnpack
 import com.lagradost.cloudstream3.utils.getPacked
+import com.lagradost.cloudstream3.utils.loadExtractor
 
-class filelions : VidHidePro() {
-    override var name = "Multimovies filelions"
-    override var mainUrl = "https://filelions.live"
+class MultimoviesAIO : StreamWishExtractor() {
+    override var name = "Multimovies Cloud AIO"
+    override var mainUrl = "https://allinonedownloader.fun"
     override var requiresReferer = true
 }
 
-class filelionslive : VidHidePro() {
-    override var name = "Multimovies filelions"
-    override var mainUrl = "https://filelions.live"
+class Multimovies : StreamWishExtractor() {
+    override var name = "Multimovies Cloud"
+    override var mainUrl = "https://multimovies.cloud"
     override var requiresReferer = true
 }
 
-class VidHidePro3 : VidHidePro() {
-    override var mainUrl = "https://filelions.to"
+class Animezia : VidhideExtractor() {
+    override var name = "Animezia"
+    override var mainUrl = "https://animezia.cloud"
+    override var requiresReferer = true
 }
 
-class VidHidePro4 : VidHidePro() {
-    override val mainUrl = "https://kinoger.be"
+class server2 : VidhideExtractor() {
+    override var name = "Multimovies Vidhide"
+    override var mainUrl = "https://server2.shop"
+    override var requiresReferer = true
 }
 
-class VidHidePro5: VidHidePro() {
-    override val mainUrl = "https://vidhidevip.com"
+class GDMirrorbot : ExtractorApi() {
+    override var name = "GDMirrorbot"
+    override var mainUrl = "https://gdmirrorbot.nl"
+    override val requiresReferer = false
+
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        app.get(url).document.select("ul#videoLinks li").map {
+            val link = it.attr("data-link")
+            loadExtractor(link, subtitleCallback, callback)
+        }
+    }
 }
 
-class VidHidePro6 : VidHidePro() {
-    override val mainUrl = "https://vidhidepre.com"
-}
+open class VidhideExtractor : ExtractorApi() {
+    override var name = "VidHide"
+    override var mainUrl = "https://vidhide.com"
+    override val requiresReferer = false
 
-class Lulustream1 : VidHidePro() {
-    override val name = "Lulustream"
-    override val mainUrl = "https://lulustream.com"
-}
-
-class Lulustream2 : VidHidePro() {
-    override val name = "Lulustream"
-    override val mainUrl = "https://luluvdo.com"
-}
-
-class Lulustream3 : VidHidePro() {
-    override val name = "Lulustream"
-    override val mainUrl = "https://kinoger.pw"
+    override suspend fun getUrl(url: String, referer: String?): List<ExtractorLink>? {
+        val response = app.get(
+            url, referer = referer ?: "$mainUrl/", interceptor = WebViewResolver(
+                Regex("""master\.m3u8""")
+            )
+        )
+        val sources = mutableListOf<ExtractorLink>()
+        if (response.url.contains("m3u8"))
+            sources.add(
+                ExtractorLink(
+                    source = name,
+                    name = name,
+                    url = response.url,
+                    referer = referer ?: "$mainUrl/",
+                    quality = Qualities.Unknown.value,
+                    isM3u8 = true
+                )
+            )
+        return sources
+    }
 }
 
 open class VidHidePro : ExtractorApi() {
@@ -97,5 +127,47 @@ open class VidHidePro : ExtractorApi() {
             else -> url.replace("/f/", "/v/")
         }
     }
+}
 
+class filelions : VidHidePro() {
+    override var name = "Multimovies filelions"
+    override var mainUrl = "https://filelions.live"
+    override var requiresReferer = true
+}
+
+class filelionslive : VidHidePro() {
+    override var name = "Multimovies filelions"
+    override var mainUrl = "https://filelions.live"
+    override var requiresReferer = true
+}
+
+class VidHidePro3 : VidHidePro() {
+    override var mainUrl = "https://filelions.to"
+}
+
+class VidHidePro4 : VidHidePro() {
+    override val mainUrl = "https://kinoger.be"
+}
+
+class VidHidePro5 : VidHidePro() {
+    override val mainUrl = "https://vidhidevip.com"
+}
+
+class VidHidePro6 : VidHidePro() {
+    override val mainUrl = "https://vidhidepre.com"
+}
+
+class Lulustream1 : VidHidePro() {
+    override val name = "Lulustream"
+    override val mainUrl = "https://lulustream.com"
+}
+
+class Lulustream2 : VidHidePro() {
+    override val name = "Lulustream"
+    override val mainUrl = "https://luluvdo.com"
+}
+
+class Lulustream3 : VidHidePro() {
+    override val name = "Lulustream"
+    override val mainUrl = "https://kinoger.pw"
 }
