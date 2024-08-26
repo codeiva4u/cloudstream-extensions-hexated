@@ -1,6 +1,15 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 // use an integer for version numbers
-version = 20
+version = 17 
+
+
+android {
+    defaultConfig {
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "MultiMovies_API", "\"${properties.getProperty("MultiMovies_API")}\"")
+    }
+}
 
 cloudstream {
     // All of these properties are optional, you can safely remove them
