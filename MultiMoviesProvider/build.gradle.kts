@@ -1,15 +1,6 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 // use an integer for version numbers
-version = 17 
-
-
-android {
-    defaultConfig {
-        val properties = Properties()
-        properties.load(project.rootProject.file("local.properties").inputStream())
-        buildConfigField("String", "MultiMovies_API", "\"${properties.getProperty("MultiMovies_API")}\"")
-    }
-}
+version = 21
 
 cloudstream {
     // All of these properties are optional, you can safely remove them
@@ -33,7 +24,7 @@ cloudstream {
     tvTypes = listOf(
         "Movie",
         "TvSeries",
-        "Anime",
+        "Live",
     )
     iconUrl = "https://raw.githubusercontent.com/LikDev-256/likdev256-tamil-providers/master/MultiMoviesProvider/icon.png"
 }
