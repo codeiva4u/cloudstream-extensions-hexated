@@ -283,6 +283,14 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
                             }
                         }
                         else
+                            if (link.contains("deaddrive.xyz"))
+                            {
+                                app.get(link).document.select("ul.list-server-items > li").map {
+                                    val server = it.attr("data-video")
+                                    loadExtractor(server,referer = mainUrl,subtitleCallback, callback)
+                                }
+                            }
+                        else
                         loadExtractor(link, referer = mainUrl, subtitleCallback, callback)
                     }
                     else -> return@apmap
