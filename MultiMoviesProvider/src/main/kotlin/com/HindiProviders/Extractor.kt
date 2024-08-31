@@ -254,45 +254,6 @@ class StreamTape(private val streamTape: StreamTape) {
         }
 }
 
-class VidSrcExtractor(private val vidSrcExtractor: VidSrcExtractor) {
-    var name: String
-        get() = vidSrcExtractor.name
-        set(value) {
-            vidSrcExtractor.name = value
-        }
-    var requiresReferer: Boolean
-        get() = vidSrcExtractor.requiresReferer
-        set(value) {
-            vidSrcExtractor.requiresReferer = value
-        }
-}
-
-class VidSrcExtractor2(private val vidSrcExtractor2: VidSrcExtractor2) {
-    var name: String
-        get() = vidSrcExtractor2.name
-        set(value) {
-            vidSrcExtractor2.name = value
-        }
-    var requiresReferer: Boolean
-        get() = vidSrcExtractor2.requiresReferer
-        set(value) {
-            vidSrcExtractor2.requiresReferer = value
-        }
-}
-
-class VidSrcTo(private val vidSrcTo: VidSrcTo) {
-    var name: String
-        get() = vidSrcTo.name
-        set(value) {
-            vidSrcTo.name = value
-        }
-    var requiresReferer: Boolean
-        get() = vidSrcTo.requiresReferer
-        set(value) {
-            vidSrcTo.requiresReferer = value
-        }
-}
-
 class XStreamCdn(private val xStreamCdn: XStreamCdn) {
     var name: String
         get() = xStreamCdn.name
