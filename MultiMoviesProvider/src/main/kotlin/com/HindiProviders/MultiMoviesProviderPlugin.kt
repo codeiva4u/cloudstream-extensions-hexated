@@ -23,9 +23,6 @@ import com.lagradost.cloudstream3.extractors.Minoplres
 import com.lagradost.cloudstream3.extractors.MixDrop
 import com.lagradost.cloudstream3.extractors.StreamTape
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
-import com.lagradost.cloudstream3.extractors.VidSrcExtractor
-import com.lagradost.cloudstream3.extractors.VidSrcExtractor2
-import com.lagradost.cloudstream3.extractors.VidSrcTo
 import com.lagradost.cloudstream3.extractors.XStreamCdn
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.Plugin
@@ -57,9 +54,6 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(JWPlayer())
         registerExtractorAPI(Minoplres())
         registerExtractorAPI(StreamWishExtractor())
-        registerExtractorAPI(VidSrcExtractor())
-        registerExtractorAPI(VidSrcExtractor2())
-        registerExtractorAPI(VidSrcTo())
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(Multimovies())
         registerExtractorAPI(Animezia())
