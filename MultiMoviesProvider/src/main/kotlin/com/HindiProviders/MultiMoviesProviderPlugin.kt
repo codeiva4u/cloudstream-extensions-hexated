@@ -47,7 +47,6 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Bestx())
         registerExtractorAPI(BullStream())
         registerExtractorAPI(Cdnplayer())
-        registerExtractorAPI(CdnwishCom())
         registerExtractorAPI(DBfilm())
         registerExtractorAPI(FEmbed())
         registerExtractorAPI(FileMoon())
@@ -64,20 +63,9 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(MultimoviesAIO())
         registerExtractorAPI(Multimovies())
         registerExtractorAPI(Animezia())
-        registerExtractorAPI(server2())
-        registerExtractorAPI(GDMirrorbot())
-        registerExtractorAPI(VidHidePro())
-        registerExtractorAPI(filelions())
-        registerExtractorAPI(filelionslive())
-        registerExtractorAPI(VidHidePro3())
-        registerExtractorAPI(VidHidePro4())
-        registerExtractorAPI(VidHidePro5())
-        registerExtractorAPI(VidHidePro6())
-        registerExtractorAPI(Lulustream1())
-        registerExtractorAPI(Lulustream2())
-        registerExtractorAPI(Lulustream3())
-       
-
-
+        registerExtractorAPI(Asnwish())
+        registerExtractorAPI(Strwishcom())
+        registerExtractorAPI(CdnwishCom())
+        
     }
 }
