@@ -66,6 +66,6 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Asnwish())
         registerExtractorAPI(Strwishcom())
         registerExtractorAPI(CdnwishCom())
-        
+
     }
 }
