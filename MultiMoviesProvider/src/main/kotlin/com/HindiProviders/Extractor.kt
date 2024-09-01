@@ -6,6 +6,10 @@ import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.network.WebViewResolver
+import com.lagradost.cloudstream3.SubtitleFile
+import com.lagradost.cloudstream3.USER_AGENT
+import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.M3u8Helper.Companion.generateM3u8
 
 class MultimoviesAIO: StreamWishExtractor() {
     override var name = "Multimovies Cloud AIO"
@@ -32,42 +36,22 @@ class server2 : VidhideExtractor() {
 }
 
 class Asnwish : StreamWishExtractor() {
-    override val name = "Streanwish Asn"
+    override var name = "Streanwish Asn"
     override val mainUrl = "https://asnwish.com"
     override val requiresReferer = true
 }
 
 class CdnwishCom : StreamWishExtractor() {
-    override val name = "Cdnwish"
+    override var name = "Cdnwish"
     override val mainUrl = "https://cdnwish.com"
     override val requiresReferer = true
 }
-/*
-class GDMirrorbot : ExtractorApi() {
-    override var name = "GDMirrorbot"
-    override var mainUrl = "https://gdmirrorbot.nl"
-    override val requiresReferer = true
-    override suspend fun getUrl(
-        url: String,
-        referer: String?,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit) {
-        Log.d("Phisher url","$url")
-        app.get(url).document.select("ul#videoLinks li").map {
-            val link=it.attr("data-link")
-            Log.d("Phisher url","$link")
-            loadExtractor(link,"https://multimovies.sbs",subtitleCallback, callback)
-        }
-    }
-}
- */
+
 class Strwishcom : StreamWishExtractor() {
-    override val name = "Strwish"
+    override var name = "Strwish"
     override val mainUrl = "https://strwish.com"
     override val requiresReferer = true
 }
-
-
 
 open class VidhideExtractor : ExtractorApi() {
     override var name = "VidHide"
@@ -93,5 +77,91 @@ open class VidhideExtractor : ExtractorApi() {
                 )
             )
         return sources
+    }
+}
+
+class VidHidePro1 : VidHidePro() {
+    override var mainUrl = "https://filelions.live"
+}
+
+class VidHidePro2 : VidHidePro() {
+    override var mainUrl = "https://filelions.online"
+}
+
+class VidHidePro3 : VidHidePro() {
+    override var mainUrl = "https://filelions.to"
+}
+
+class VidHidePro4 : VidHidePro() {
+    override val mainUrl = "https://kinoger.be"
+}
+
+class VidHidePro5: VidHidePro() {
+    override val mainUrl = "https://vidhidevip.com"
+}
+
+class VidHidePro6 : VidHidePro() {
+    override val mainUrl = "https://vidhidepre.com"
+}
+
+class Lulustream1 : VidHidePro() {
+    override val name = "Lulustream"
+    override val mainUrl = "https://lulustream.com"
+}
+
+class Lulustream2 : VidHidePro() {
+    override val name = "Lulustream"
+    override val mainUrl = "https://luluvdo.com"
+}
+
+class Lulustream3 : VidHidePro() {
+    override val name = "Lulustream"
+    override val mainUrl = "https://kinoger.pw"
+}
+
+open class VidHidePro : ExtractorApi() {
+    override val name = "VidHidePro"
+    override val mainUrl = "https://vidhidepro.com"
+    override val requiresReferer = true
+
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val headers = mapOf(
+            "Accept" to "*/*",
+            "Connection" to "keep-alive",
+            "Sec-Fetch-Dest" to "empty",
+            "Sec-Fetch-Mode" to "cors",
+            "Sec-Fetch-Site" to "cross-site",
+            "Origin" to "$mainUrl/",
+            "User-Agent" to USER_AGENT,
+        )
+
+        val response = app.get(getEmbedUrl(url), referer = referer)
+        val script = if (!getPacked(response.text).isNullOrEmpty()) {
+            getAndUnpack(response.text)
+        } else {
+            response.document.selectFirst("script:containsData(sources:)")?.data()
+        }
+        val m3u8 =
+            Regex("file:\\s*\"(.*?m3u8.*?)\"").find(script ?: return)?.groupValues?.getOrNull(1)
+        generateM3u8(
+            name,
+            m3u8 ?: return,
+            mainUrl,
+            headers = headers
+        ).forEach(callback)
+    }
+
+    private fun getEmbedUrl(url: String): String {
+        return when {
+            url.contains("/d/") -> url.replace("/d/", "/v/")
+            url.contains("/download/") -> url.replace("/download/", "/v/")
+            url.contains("/file/") -> url.replace("/file/", "/v/")
+            else -> url.replace("/f/", "/v/")
+        }
     }
 }
