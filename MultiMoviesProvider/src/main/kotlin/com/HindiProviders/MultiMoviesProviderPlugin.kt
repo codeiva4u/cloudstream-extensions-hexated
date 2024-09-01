@@ -6,15 +6,12 @@ import android.content.Context
 import com.lagradost.cloudstream3.extractors.DoodLaExtractor
 import com.lagradost.cloudstream3.extractors.MixDrop
 import com.lagradost.cloudstream3.extractors.XStreamCdn
-import com.lagradost.cloudstream3.extractors.VidHidePro5
-import com.lagradost.cloudstream3.extractors.VidHidePro6
 
 @CloudstreamPlugin
 class MultiMoviesProviderPlugin: Plugin() {
     override fun load(context: Context) {
         // All providers should be added in this manner. Please don't edit the providers list directly.
         registerMainAPI(MultiMoviesProvider())
-        registerExtractorAPI(VidHidePro5())
         registerExtractorAPI(MixDrop())
         registerExtractorAPI(Multimovies())
         registerExtractorAPI(XStreamCdn())
@@ -27,6 +24,14 @@ class MultiMoviesProviderPlugin: Plugin() {
         registerExtractorAPI(Asnwish())
         registerExtractorAPI(CdnwishCom())
         registerExtractorAPI(Strwishcom())
+        registerExtractorAPI(VidHidePro1())
+        registerExtractorAPI(VidHidePro2())
+        registerExtractorAPI(VidHidePro3())
+        registerExtractorAPI(VidHidePro4())
+        registerExtractorAPI(VidHidePro5())
         registerExtractorAPI(VidHidePro6())
-        }
+        registerExtractorAPI(Lulustream1())
+        registerExtractorAPI(Lulustream2())
+        registerExtractorAPI(Lulustream3())
+    }
 }
