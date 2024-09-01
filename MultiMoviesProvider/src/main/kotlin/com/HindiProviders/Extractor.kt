@@ -80,43 +80,58 @@ open class VidhideExtractor : ExtractorApi() {
     }
 }
 
-class VidHidePro1 : VidHidePro() {
+class filelionslive : VidHidePro() {
+    override var name = "filelionslive"
     override var mainUrl = "https://filelions.live"
+    override val requiresReferer = true
 }
 
-class VidHidePro2 : VidHidePro() {
+class filelionsonline : VidHidePro() {
+    override var name = "filelionsonline"
     override var mainUrl = "https://filelions.online"
+    override val requiresReferer = true
 }
 
-class VidHidePro3 : VidHidePro() {
+class filelionsto : VidHidePro() {
+    override var name = "filelionsto"
     override var mainUrl = "https://filelions.to"
+    override val requiresReferer = true
 }
 
-class VidHidePro4 : VidHidePro() {
+class kinogerbe : VidHidePro() {
+    override var name = "kinogerbe"
     override val mainUrl = "https://kinoger.be"
+    override val requiresReferer = true
 }
 
-class VidHidePro5: VidHidePro() {
+class vidhidevipcom : VidHidePro() {
+    override var name = "vidhidevipcom"
     override val mainUrl = "https://vidhidevip.com"
+    override val requiresReferer = true
 }
 
-class VidHidePro6 : VidHidePro() {
+class vidhideprecom : VidHidePro() {
+    override var name = "vidhideprecom"
     override val mainUrl = "https://vidhidepre.com"
+    override val requiresReferer = true
 }
 
-class Lulustream1 : VidHidePro() {
-    override val name = "Lulustream"
+class lulustreamcom : VidHidePro() {
+    override var name = "lulustreamcom"
     override val mainUrl = "https://lulustream.com"
+    override val requiresReferer = true
 }
 
-class Lulustream2 : VidHidePro() {
-    override val name = "Lulustream"
+class luluvdocom : VidHidePro() {
+    override var name = "luluvdocom"
     override val mainUrl = "https://luluvdo.com"
+    override val requiresReferer = true
 }
 
-class Lulustream3 : VidHidePro() {
-    override val name = "Lulustream"
+class kinogerpw : VidHidePro() {
+    override var name = "kinogerpw"
     override val mainUrl = "https://kinoger.pw"
+    override val requiresReferer = true
 }
 
 open class VidHidePro : ExtractorApi() {
