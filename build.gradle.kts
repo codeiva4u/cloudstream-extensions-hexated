@@ -43,13 +43,12 @@ subprojects {
 
     android {
         defaultConfig {
-            minSdk = 28 // Update this to 26 or higher
+            minSdk = 21
             compileSdkVersion(33)
             targetSdk = 33
         }
 
         compileOptions {
-       //     isCoreLibraryDesugaringEnabled = true
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8
         }
@@ -77,15 +76,14 @@ subprojects {
         // but you dont need to include any of them if you dont need them
         // https://github.com/recloudstream/cloudstream/blob/master/app/build.gradle
 
-
         implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc
         implementation("com.github.Blatzar:NiceHttp:0.4.11") // http library
         implementation("org.jsoup:jsoup:1.18.1") // html parser
-        implementation("com.android.tools:desugar_jdk_libs:2.0.4")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-        implementation("com.faendir.rhino:rhino-android:1.6.0")
-        implementation("me.xdrop:fuzzywuzzy:1.4.0")
+        implementation("com.squareup.okhttp3:okhttp:4.12.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+        implementation("org.mozilla:rhino:1.7.15") //run JS
+        implementation("com.google.code.gson:gson:2.8.8")
 
     }
 }

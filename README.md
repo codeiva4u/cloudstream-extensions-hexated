@@ -1,5 +1,5 @@
 
-<a href="https://raw.githubusercontent.com/codeiva4u/cloudstream-extensions-hexated/builds/repo">Install</a>
+<a href="https://raw.githubusercontent.com/SaurabhKaperwan/CSX/builds/CS.json">Install</a>
 # `Cloudstream3 Plugin Repo Template`
 
 Template for a [Cloudstream3](https://github.com/recloudstream) plugin repo
