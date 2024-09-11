@@ -5,16 +5,22 @@ import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import com.lagradost.cloudstream3.LoadResponse.Companion.addImdbUrl
+import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
+import com.google.gson.Gson
+import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 
-class MoviesDriveProvider : MainAPI() {
-    override var mainUrl = "https://moviesdrive.website"
+class MoviesDriveProvider : MainAPI() { // all providers must be an instance of MainAPI
+    override var mainUrl = "https://moviesdrive.world"
     override var name = "MoviesDrive"
     override val hasMainPage = true
     override var lang = "hi"
     override val hasDownloadSupport = true
+    val cinemeta_url = "https://v3-cinemeta.strem.io/meta"
     override val supportedTypes = setOf(
         TvType.Movie,
-        TvType.TvSeries
+        TvType.TvSeries,
+        TvType.AsianDrama,
+        TvType.Anime
     )
 
     override val mainPage = mainPageOf(
