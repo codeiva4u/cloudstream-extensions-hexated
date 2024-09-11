@@ -8,7 +8,7 @@ import com.lagradost.cloudstream3.base64Decode
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 
 class CinemaluxeProvider : MainAPI() { // all providers must be an instance of MainAPI
-    override var mainUrl = "https://cinemaluxe.link"
+    override var mainUrl = "https://cinemaluxe.click"
     override var name = "Cinemaluxe"
     override val hasMainPage = true
     override var lang = "hi"
@@ -101,7 +101,8 @@ class CinemaluxeProvider : MainAPI() { // all providers must be an instance of M
                 val realSeason = matchResult?.groupValues?.get(1)?.toIntOrNull() ?: 0
                 val spanTag = hTag.nextElementSibling()
                 val seasonLink = spanTag ?.selectFirst("a")?.attr("href").toString()
-                val doc = app.get(seasonLink).document
+                val trueSeasonLink = bypass(seasonLink)
+                val doc = app.get(trueSeasonLink).document
                 var aTags = doc.select("a:matches((?i)(Episode))")
                 
                 aTags.mapNotNull { aTag ->
@@ -142,7 +143,8 @@ class CinemaluxeProvider : MainAPI() { // all providers must be an instance of M
             val buttons = document.select("a.maxbutton")
             val data = buttons.flatMap { button ->
                 val link = button.attr("href")
-                val doc = app.get(link).document
+                val trueLink = bypass(link)
+                val doc = app.get(trueLink).document
                 doc.select("a.maxbutton").mapNotNull {
                     val source = it.attr("href")
                     EpisodeLink(
@@ -166,8 +168,7 @@ class CinemaluxeProvider : MainAPI() { // all providers must be an instance of M
         val sources = parseJson<ArrayList<EpisodeLink>>(data)
         sources.amap {
             val source = it.source
-            val link = bypass(source)
-            loadExtractor(link, subtitleCallback, callback)
+            loadExtractor(source, subtitleCallback, callback)
         }
         return true   
     }
