@@ -36,7 +36,7 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
         "$mainUrl/web-series/mx-player-originals/" to "MX PLAYER ORIGINALS",
     )
 
-    override suspend fun getMainPage(
+   override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
