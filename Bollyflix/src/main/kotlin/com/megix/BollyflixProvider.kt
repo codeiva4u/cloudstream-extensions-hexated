@@ -31,7 +31,7 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
         "$mainUrl/movies/bollywood/" to "Bollywood Movies",
         "$mainUrl/movies/hollywood/" to "Hollywood Movies",
         "$mainUrl/web-series/netflix/" to "NETFLIX",
-        "$mainUrl/web-series/amazon-prime-vide/" to "AMAZON PRIME VIDEO",
+        "$mainUrl/web-series/amazon-prime-video/" to "AMAZON PRIME VIDEO",
         "$mainUrl/web-series/hotstar/" to "HOTSTAR",
         "$mainUrl/web-series/mx-player-originals/" to "MX PLAYER ORIGINALS",
     )
