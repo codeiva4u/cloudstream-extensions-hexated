@@ -75,7 +75,7 @@ open class HDMovies4u : TmdbProvider() {
     }
 
     override val mainPage = mainPageOf(
-        "$tmdbAPI/category/bollywood-1080p/popular?api_key=$apiKey&region=US" to "Bollywood Movies",
+        "$tmdbAPI/category/bollywood-1080p?api_key=$apiKey&region=US" to "Bollywood Movies",
         "$tmdbAPI/tv/popular?api_key=$apiKey&region=US&with_original_language=en" to "Popular TV Shows",
         "$tmdbAPI/tv/airing_today?api_key=$apiKey&region=US&with_original_language=en" to "Airing Today TV Shows",
         "$tmdbAPI/discover/tv?api_key=$apiKey&with_networks=213" to "Netflix",
