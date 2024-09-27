@@ -11,6 +11,7 @@ import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.LoadResponse.Companion.addImdbId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTMDbId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.ShowStatus
@@ -20,7 +21,6 @@ import com.lagradost.cloudstream3.addDate
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.argamap
 import com.lagradost.cloudstream3.mainPageOf
-import com.lagradost.cloudstream3.metaproviders.TmdbProvider
 import com.lagradost.cloudstream3.network.CloudflareKiller
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.newMovieLoadResponse
@@ -35,11 +35,12 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.roundToInt
 
-class HDMovies4u : TmdbProvider() {
+class HDMovies4u : MainAPI() {
+
+    override var mainUrl = "https://hdmovies4u.boston"
     override var name = "HDMovies4u"
     override val hasMainPage = true
     override val instantLinkLoading = true
-    override val useMetaLoadResponse = true
     override val hasQuickSearch = true
     override val supportedTypes = setOf(
         TvType.Movie,
@@ -51,14 +52,6 @@ class HDMovies4u : TmdbProvider() {
     /** AUTHOR : hexated & Code */
     companion object {
         /** ALL SOURCES */
-
-        const val hdmovies4uAPI = "https://hdmovies4u.boston"
-        fun getType(t: String?): TvType {
-            return when (t) {
-                "movie" -> TvType.Movie
-                else -> TvType.TvSeries
-            }
-        }
 
         fun getStatus(t: String?): ShowStatus {
             return when (t) {
@@ -81,6 +74,8 @@ class HDMovies4u : TmdbProvider() {
         "$mainUrl/category/bollywood-1080p/" to "Bollywood Movies",
     )
 
+    private val hdmovies4uAPI = "https://api.hdmovies4u.com"
+
     private fun getImageUrl(link: String?): String? {
         if (link == null) return null
         return if (link.startsWith("/")) "https://image.tmdb.org/t/p/w500/$link" else link
@@ -95,7 +90,7 @@ class HDMovies4u : TmdbProvider() {
         val home = app.get("${request.data}?page=$page")
             .parsedSafe<Results>()?.results?.mapNotNull { media ->
                 media.toSearchResponse()
-            } ?: throw ErrorLoadingException("Invalid Json reponse")
+            } ?: throw ErrorLoadingException("Invalid Json response")
         return newHomePageResponse(request.name, home)
     }
 
@@ -120,7 +115,7 @@ class HDMovies4u : TmdbProvider() {
 
     override suspend fun load(url: String): LoadResponse? {
         val data = parseJson<Data>(url)
-        val type = getType(data.type)
+        val type = getType()
         Log.d("Test1","$type")
         val res = app.get("$hdmovies4uAPI/movie/${data.id}").parsedSafe<MediaDetail>()
             ?: throw ErrorLoadingException("Invalid Json Response")
@@ -209,7 +204,7 @@ class HDMovies4u : TmdbProvider() {
                 this.showStatus = getStatus(res.status)
                 this.recommendations = recommendations
                 this.actors = actors
-                this.contentRating = fetchContentRating(data.id, "US")
+                this.contentRating = fetchContentRating(data.id)
                 addTrailer(trailer)
                 addTMDbId(data.id.toString())
                 addImdbId(res.external_ids?.imdb_id)
@@ -249,12 +244,16 @@ class HDMovies4u : TmdbProvider() {
                 this.rating = rating
                 this.recommendations = recommendations
                 this.actors = actors
-                this.contentRating = fetchContentRating(data.id, "US")
+                this.contentRating = fetchContentRating(data.id)
                 addTrailer(trailer)
                 addTMDbId(data.id.toString())
                 addImdbId(res.external_ids?.imdb_id)
             }
         }
+    }
+
+    private fun getType(): Any {
+        TODO("Not yet implemented")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -280,10 +279,9 @@ class HDMovies4u : TmdbProvider() {
         return true
     }
 
-    override suspend fun fetchContentRating(id: Int?, country: String): String? {
+    suspend fun fetchContentRating(id: Int?): String? {
         // यहां आपको वास्तविक कंटेंट रेटिंग प्राप्त करने के लिए कुछ तर्क लिखना होगा।
         // उदाहरण के लिए, आप एक API कॉल कर सकते हैं या डेटाबेस से डेटा प्राप्त कर सकते हैं।
-        // यहां एक डमी उदाहरण दिया गया है:
         return when (id) {
             123 -> "PG-13"
             456 -> "R"
