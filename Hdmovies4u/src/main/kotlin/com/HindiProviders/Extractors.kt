@@ -62,7 +62,7 @@ open class Hdmovies4u : ExtractorApi() {
             callback.invoke(
                 ExtractorLink(
                     this.name,
-                    "HDMovies4u [$quality]p",
+                    "Hdmovies4u [$quality]p",
                     decodedLink,
                     referer ?: "",
                     quality
