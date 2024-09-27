@@ -33,7 +33,7 @@ val client = OkHttpClient()
 // Initialize a session object (singleton pattern)
 val session = Session(client)
 
-open class Hdmovies4uExtractor : ExtractorApi() {
+open class Hdmovies4u : ExtractorApi() {
     override val name = "HDMovies4u"
     override val mainUrl = "https://hdmovies4u.xyz"
     override val requiresReferer = true
@@ -82,7 +82,7 @@ open class Hdmovies4uExtractor : ExtractorApi() {
     }
 }
 
-open class DrivetotExtractor : ExtractorApi() {
+open class Drivetot : ExtractorApi() {
     override val name = "Drivetot"
     override val mainUrl = "https://drivetot.xyz"
     override val requiresReferer = true

@@ -4,6 +4,10 @@ import org.jetbrains.kotlin.konan.properties.Properties
 
 // use an integer for version numbers
 version = 1
+dependencies {
+    implementation("androidx.media3:media3-extractor:1.4.1")
+    implementation("com.google.android.gms:play-services-dtdi:16.0.0-beta02")
+}
 
 cloudstream {
     language = "hi"

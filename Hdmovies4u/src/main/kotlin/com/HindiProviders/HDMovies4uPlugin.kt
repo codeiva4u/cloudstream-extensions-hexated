@@ -21,6 +21,9 @@ class HDMovies4uPlugin: Plugin() {
     override fun load(context: Context) {
         // All providers should be added in this manner. Please don't edit the providers list directly.
         registerMainAPI(HDMovies4u())
+        registerExtractorAPI(Drivetot())
+        registerExtractorAPI(Gdmirrorbot())
+        registerExtractorAPI(Streamvid())
         registerExtractorAPI(Playm4u())
         registerExtractorAPI(Vidplay())
         registerExtractorAPI(FileMoon())
@@ -41,4 +44,6 @@ class HDMovies4uPlugin: Plugin() {
         registerExtractorAPI(GDFlix2())
         registerExtractorAPI(VidSrcExtractor())
     }
-}
+
+
+    }

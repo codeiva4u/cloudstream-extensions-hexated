@@ -2,45 +2,27 @@ package com.HindiProviders
 
 import android.util.Log
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.lagradost.cloudstream3.Actor
-import com.lagradost.cloudstream3.ActorData
-import com.lagradost.cloudstream3.Episode
-import com.lagradost.cloudstream3.ErrorLoadingException
-import com.lagradost.cloudstream3.HomePageResponse
-import com.lagradost.cloudstream3.LoadResponse
+import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addImdbId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTMDbId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
-import com.lagradost.cloudstream3.MainAPI
-import com.lagradost.cloudstream3.MainPageRequest
-import com.lagradost.cloudstream3.SearchResponse
-import com.lagradost.cloudstream3.ShowStatus
-import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.TvType
-import com.lagradost.cloudstream3.addDate
-import com.lagradost.cloudstream3.app
-import com.lagradost.cloudstream3.argamap
-import com.lagradost.cloudstream3.mainPageOf
+import com.lagradost.cloudstream3.metaproviders.TmdbProvider
 import com.lagradost.cloudstream3.network.CloudflareKiller
-import com.lagradost.cloudstream3.newHomePageResponse
-import com.lagradost.cloudstream3.newMovieLoadResponse
-import com.lagradost.cloudstream3.newMovieSearchResponse
-import com.lagradost.cloudstream3.newTvSeriesLoadResponse
-import com.lagradost.cloudstream3.toRatingInt
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 import kotlin.math.roundToInt
 
-class HDMovies4u : MainAPI() {
-
-    override var mainUrl = "https://hdmovies4u.boston"
+open class HDMovies4u : TmdbProvider() {
     override var name = "HDMovies4u"
     override val hasMainPage = true
     override val instantLinkLoading = true
+    override val useMetaLoadResponse = true
     override val hasQuickSearch = true
     override val supportedTypes = setOf(
         TvType.Movie,
@@ -51,7 +33,20 @@ class HDMovies4u : MainAPI() {
 
     /** AUTHOR : hexated & Code */
     companion object {
+        /** TOOLS */
+        private const val tmdbAPI = "https://api.themoviedb.org/3"
+        const val gdbot = "https://gdtot.pro"
+
+        private const val apiKey = "2731588dd3f05a29f90404e51678fa10"
+
         /** ALL SOURCES */
+        const val hdmovies4uAPI = "https://hdmovies4u.boston"
+        fun getType(t: String?): TvType {
+            return when (t) {
+                "movie" -> TvType.Movie
+                else -> TvType.TvSeries
+            }
+        }
 
         fun getStatus(t: String?): ShowStatus {
             return when (t) {
@@ -60,21 +55,34 @@ class HDMovies4u : MainAPI() {
             }
         }
 
-        fun isUpcoming(airDate: String?): Boolean {
-            return airDate?.let {
-                val airDateMillis = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(it)?.time ?: 0L
-                airDateMillis > System.currentTimeMillis()
-            } ?: false
+        fun isUpcoming(date: String?): Boolean {
+            if (date == null) return false
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val airDate = dateFormat.parse(date)
+            return airDate?.after(Date()) ?: false
+        }
+
+        fun invokeHdmovies4u(
+            title: String?,
+            imdbId: String?,
+            season: Int?,
+            episode: Int?,
+            subtitleCallback: (SubtitleFile) -> Unit,
+            callback: (ExtractorLink) -> Unit
+        ) {
+            // Implement the logic to invoke HDMovies4u here
         }
     }
 
     override val mainPage = mainPageOf(
-        "$mainUrl/category/hollywood-movies-1080p/" to "Hollywood Hindi Movies",
-        "$mainUrl/category/south-hindi-dubbed-720p/" to "South Hindi Movies",
-        "$mainUrl/category/bollywood-1080p/" to "Bollywood Movies",
+        "$tmdbAPI/trending/all/day?api_key=$apiKey&region=US" to "Trending",
+        "$tmdbAPI/movie/popular?api_key=$apiKey&region=US" to "Popular Movies",
+        "$tmdbAPI/tv/popular?api_key=$apiKey&region=US&with_original_language=en" to "Popular TV Shows",
+        "$tmdbAPI/tv/airing_today?api_key=$apiKey&region=US&with_original_language=en" to "Airing Today TV Shows",
+        "$tmdbAPI/discover/tv?api_key=$apiKey&with_networks=213" to "Netflix",
+        "$tmdbAPI/discover/tv?api_key=$apiKey&with_networks=1024" to "Amazon",
+        "$tmdbAPI/discover/tv?api_key=$apiKey&with_networks=2739" to "Disney+",
     )
-
-    private val hdmovies4uAPI = "https://api.hdmovies4u.com"
 
     private fun getImageUrl(link: String?): String? {
         if (link == null) return null
@@ -87,17 +95,20 @@ class HDMovies4u : MainAPI() {
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val home = app.get("${request.data}?page=$page")
+        val adultQuery =
+            if (settingsForProvider.enableAdult) "" else "&without_keywords=190370|13059|226161|195669"
+        val type = if (request.data.contains("/movie")) "movie" else "tv"
+        val home = app.get("${request.data}$adultQuery&page=$page")
             .parsedSafe<Results>()?.results?.mapNotNull { media ->
-                media.toSearchResponse()
-            } ?: throw ErrorLoadingException("Invalid Json response")
+                media.toSearchResponse(type)
+            } ?: throw ErrorLoadingException("Invalid Json reponse")
         return newHomePageResponse(request.name, home)
     }
 
-    private fun Media.toSearchResponse(): SearchResponse? {
+    private fun Media.toSearchResponse(type: String? = null): SearchResponse? {
         return newMovieSearchResponse(
             title ?: name ?: originalTitle ?: return null,
-            Data(id = id, type = mediaType).toJson(),
+            Data(id = id, type = mediaType ?: type).toJson(),
             TvType.Movie,
         ) {
             this.posterUrl = getImageUrl(posterPath)
@@ -107,7 +118,7 @@ class HDMovies4u : MainAPI() {
     override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query)
 
     override suspend fun search(query: String): List<SearchResponse>? {
-        return app.get("$hdmovies4uAPI/search?query=$query")
+        return app.get("$tmdbAPI/search/multi?api_key=$apiKey&language=en-US&query=$query&page=1&include_adult=${settingsForProvider.enableAdult}")
             .parsedSafe<Results>()?.results?.mapNotNull { media ->
                 media.toSearchResponse()
             }
@@ -115,9 +126,17 @@ class HDMovies4u : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse? {
         val data = parseJson<Data>(url)
-        val type = getType()
+        val type = getType(data.type)
         Log.d("Test1","$type")
-        val res = app.get("$hdmovies4uAPI/movie/${data.id}").parsedSafe<MediaDetail>()
+        val append = "alternative_titles,credits,external_ids,keywords,videos,recommendations"
+        val resUrl = if (type == TvType.Movie) {
+            "$tmdbAPI/movie/${data.id}?api_key=$apiKey&append_to_response=$append"
+        } else {
+            "$tmdbAPI/tv/${data.id}?api_key=$apiKey&append_to_response=$append"
+        }
+        Log.d("Test1",resUrl)
+        println(resUrl)
+        val res = app.get(resUrl).parsedSafe<MediaDetail>()
             ?: throw ErrorLoadingException("Invalid Json Response")
 
         val title = res.title ?: res.name ?: return null
@@ -154,7 +173,7 @@ class HDMovies4u : MainAPI() {
         if (type == TvType.TvSeries) {
             val lastSeason = res.last_episode_to_air?.season_number
             val episodes = res.seasons?.mapNotNull { season ->
-                app.get("$hdmovies4uAPI/tv/${data.id}/season/${season.seasonNumber}")
+                app.get("$tmdbAPI/${data.type}/${data.id}/season/${season.seasonNumber}?api_key=$apiKey")
                     .parsedSafe<MediaDetailEpisodes>()?.episodes?.map { eps ->
                         Episode(
                             LinkData(
@@ -190,24 +209,46 @@ class HDMovies4u : MainAPI() {
                         }
                     }
             }?.flatten() ?: listOf()
-            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-                this.posterUrl = poster
-                this.backgroundPosterUrl = bgPoster
-                this.year = year
-                this.plot = res.overview
-                this.tags = keywords
-                    ?.map { word -> word.replaceFirstChar { it.titlecase() } }
-                    ?.takeIf { it.isNotEmpty() }
-                    ?: genres
+            if (isAnime) {
+                return newAnimeLoadResponse(title, url, TvType.Anime) {
+                    addEpisodes(DubStatus.Subbed, episodes)
+                    this.posterUrl = poster
+                    this.backgroundPosterUrl = bgPoster
+                    this.year = year
+                    this.plot = res.overview
+                    this.tags = keywords
+                        ?.map { word -> word.replaceFirstChar { it.titlecase() } }
+                        ?.takeIf { it.isNotEmpty() }
+                        ?: genres
+                    this.rating = rating
+                    this.showStatus = getStatus(res.status)
+                    this.recommendations = recommendations
+                    this.actors = actors
+                    this.contentRating = fetchContentRating(data.id, "US")
+                    addTrailer(trailer)
+                    addTMDbId(data.id.toString())
+                    addImdbId(res.external_ids?.imdb_id)
+                }
+            } else {
+                return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+                    this.posterUrl = poster
+                    this.backgroundPosterUrl = bgPoster
+                    this.year = year
+                    this.plot = res.overview
+                    this.tags = keywords
+                        ?.map { word -> word.replaceFirstChar { it.titlecase() } }
+                        ?.takeIf { it.isNotEmpty() }
+                        ?: genres
 
-                this.rating = rating
-                this.showStatus = getStatus(res.status)
-                this.recommendations = recommendations
-                this.actors = actors
-                this.contentRating = fetchContentRating(data.id)
-                addTrailer(trailer)
-                addTMDbId(data.id.toString())
-                addImdbId(res.external_ids?.imdb_id)
+                    this.rating = rating
+                    this.showStatus = getStatus(res.status)
+                    this.recommendations = recommendations
+                    this.actors = actors
+                    this.contentRating = fetchContentRating(data.id, "US")
+                    addTrailer(trailer)
+                    addTMDbId(data.id.toString())
+                    addImdbId(res.external_ids?.imdb_id)
+                }
             }
         } else {
             return newMovieLoadResponse(
@@ -244,16 +285,12 @@ class HDMovies4u : MainAPI() {
                 this.rating = rating
                 this.recommendations = recommendations
                 this.actors = actors
-                this.contentRating = fetchContentRating(data.id)
+                this.contentRating = fetchContentRating(data.id, "US")
                 addTrailer(trailer)
                 addTMDbId(data.id.toString())
                 addImdbId(res.external_ids?.imdb_id)
             }
         }
-    }
-
-    private fun getType(): Any {
-        TODO("Not yet implemented")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -266,27 +303,17 @@ class HDMovies4u : MainAPI() {
         val res = parseJson<LinkData>(data)
         Log.d("Test1", "$res")
         println(res)
-        argamap({
-            // invokeHdmovies4u(
-            //     res.title,
-            //     res.imdbId,
-            //     res.season,
-            //     res.episode,
-            //     subtitleCallback,
-            //     callback
-            // )
-        })
-        return true
-    }
-
-    suspend fun fetchContentRating(id: Int?): String? {
-        // यहां आपको वास्तविक कंटेंट रेटिंग प्राप्त करने के लिए कुछ तर्क लिखना होगा।
-        // उदाहरण के लिए, आप एक API कॉल कर सकते हैं या डेटाबेस से डेटा प्राप्त कर सकते हैं।
-        return when (id) {
-            123 -> "PG-13"
-            456 -> "R"
-            else -> null
+        GlobalScope.launch {
+            invokeHdmovies4u(
+                res.title,
+                res.imdbId,
+                res.season,
+                res.episode,
+                subtitleCallback,
+                callback
+            )
         }
+        return true
     }
 
     data class LinkData(
@@ -296,8 +323,6 @@ class HDMovies4u : MainAPI() {
         val type: String? = null,
         val season: Int? = null,
         val episode: Int? = null,
-        val aniId: String? = null,
-        val animeId: String? = null,
         val title: String? = null,
         val year: Int? = null,
         val orgTitle: String? = null,
@@ -316,8 +341,6 @@ class HDMovies4u : MainAPI() {
     data class Data(
         val id: Int? = null,
         val type: String? = null,
-        val aniId: String? = null,
-        val malId: Int? = null,
     )
 
     data class Results(
