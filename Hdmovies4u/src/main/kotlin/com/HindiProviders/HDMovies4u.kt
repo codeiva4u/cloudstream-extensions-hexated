@@ -37,7 +37,7 @@ open class HDMovies4u : TmdbProvider() {
         private const val tmdbAPI = "https://api.themoviedb.org/3"
         const val gdbot = "https://gdtot.pro"
 
-        private const val apiKey = "2731588dd3f05a29f90404e51678fa10"
+        private const val apiKey = ""
 
         /** ALL SOURCES */
         const val hdmovies4uAPI = "https://hdmovies4u.boston"
