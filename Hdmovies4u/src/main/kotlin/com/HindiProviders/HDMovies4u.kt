@@ -37,7 +37,7 @@ open class HDMovies4u : TmdbProvider() {
         private const val tmdbAPI = "https://api.themoviedb.org/3"
         const val gdbot = "https://gdtot.pro"
 
-        private const val apiKey = ""
+        private const val apiKey = "2731588dd3f05a29f90404e51678fa10"
 
         /** ALL SOURCES */
         const val hdmovies4uAPI = "https://hdmovies4u.boston"
@@ -75,7 +75,7 @@ open class HDMovies4u : TmdbProvider() {
     }
 
     override val mainPage = mainPageOf(
-        "$tmdbAPI/trending/all/day?api_key=$apiKey&region=US" to "Trending",
+        "$tmdbAPI/category/bollywood-1080p/popular?api_key=$apiKey&region=US" to "Bollywood Movies",
         "$tmdbAPI/movie/popular?api_key=$apiKey&region=US" to "Popular Movies",
         "$tmdbAPI/tv/popular?api_key=$apiKey&region=US&with_original_language=en" to "Popular TV Shows",
         "$tmdbAPI/tv/airing_today?api_key=$apiKey&region=US&with_original_language=en" to "Airing Today TV Shows",
