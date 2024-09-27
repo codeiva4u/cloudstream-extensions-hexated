@@ -34,7 +34,7 @@ val client = OkHttpClient()
 val session = Session(client)
 
 open class Hdmovies4u : ExtractorApi() {
-    override val name = "HDMovies4u"
+    override val name = "Hdmovies4u"
     override val mainUrl = "https://hdmovies4u.xyz"
     override val requiresReferer = true
 
