@@ -280,6 +280,17 @@ class HDMovies4u : TmdbProvider() {
         return true
     }
 
+    override suspend fun fetchContentRating(id: Int?, country: String): String? {
+        // यहां आपको वास्तविक कंटेंट रेटिंग प्राप्त करने के लिए कुछ तर्क लिखना होगा।
+        // उदाहरण के लिए, आप एक API कॉल कर सकते हैं या डेटाबेस से डेटा प्राप्त कर सकते हैं।
+        // यहां एक डमी उदाहरण दिया गया है:
+        return when (id) {
+            123 -> "PG-13"
+            456 -> "R"
+            else -> null
+        }
+    }
+
     data class LinkData(
         val id: Int? = null,
         val imdbId: String? = null,
