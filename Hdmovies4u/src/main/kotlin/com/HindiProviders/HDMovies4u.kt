@@ -19,7 +19,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 open class HDMovies4u : TmdbProvider() {
-    override var name = "HDMovies4u"
+    override var name = "Hdmovies4u"
     override val hasMainPage = true
     override val instantLinkLoading = true
     override val useMetaLoadResponse = true
