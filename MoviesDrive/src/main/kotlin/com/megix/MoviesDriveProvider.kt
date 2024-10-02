@@ -1,13 +1,30 @@
 package com.megix
 
-import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
-import com.lagradost.cloudstream3.LoadResponse.Companion.addImdbUrl
-import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.google.gson.Gson
+import com.lagradost.cloudstream3.Episode
+import com.lagradost.cloudstream3.HomePageResponse
+import com.lagradost.cloudstream3.LoadResponse
+import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
+import com.lagradost.cloudstream3.LoadResponse.Companion.addImdbUrl
+import com.lagradost.cloudstream3.MainAPI
+import com.lagradost.cloudstream3.MainPageRequest
+import com.lagradost.cloudstream3.SearchQuality
+import com.lagradost.cloudstream3.SearchResponse
+import com.lagradost.cloudstream3.SubtitleFile
+import com.lagradost.cloudstream3.TvType
+import com.lagradost.cloudstream3.amap
+import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.mainPageOf
+import com.lagradost.cloudstream3.newEpisode
+import com.lagradost.cloudstream3.newHomePageResponse
+import com.lagradost.cloudstream3.newMovieLoadResponse
+import com.lagradost.cloudstream3.newMovieSearchResponse
+import com.lagradost.cloudstream3.newTvSeriesLoadResponse
+import com.lagradost.cloudstream3.toRatingInt
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.loadExtractor
+import org.jsoup.nodes.Element
 
 class MoviesDriveProvider : MainAPI() { // all providers must be an instance of MainAPI
     override var mainUrl = "https://moviesdrive.world"
@@ -46,19 +63,25 @@ class MoviesDriveProvider : MainAPI() { // all providers must be an instance of 
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title = this.selectFirst("figure > img")?.attr("title")?.replace("Download ", "")?.toString() ?: ""
-        val href = fixUrl(this.selectFirst("figure > a")?.attr("href")?.toString() ?: "")
-        val posterUrl = fixUrlNull(this.selectFirst("figure > img")?.attr("src")?.toString() ?: "")
-    
+        val title = this.selectFirst("figure > img")?.attr("title")?.replace("Download ", "").toString()
+        val href = this.selectFirst("figure > a")?.attr("href").toString()
+        val posterUrl = this.selectFirst("figure > img")?.attr("src").toString()
+        val quality = if(title.contains("HDCAM", ignoreCase = true) || title.contains("CAMRip", ignoreCase = true)) {
+            SearchQuality.CamRip
+        }
+        else {
+            null
+        }
         return newMovieSearchResponse(title, href, TvType.Movie) {
             this.posterUrl = posterUrl
+            this.quality = quality
         }
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
         val searchResponse = mutableListOf<SearchResponse>()
 
-        for (i in 1..3) {
+        for (i in 1..25) {
             val document = app.get("$mainUrl/page/$i/?s=$query").document
 
             val results = document.select("ul.recent-movies > li").mapNotNull { it.toSearchResult() }
@@ -75,7 +98,7 @@ class MoviesDriveProvider : MainAPI() { // all providers must be an instance of 
     override suspend fun load(url: String): LoadResponse? {
         val document = app.get(url).document
         var title = document.selectFirst("meta[property=og:title]")?.attr("content")?.replace("Download ", "").toString()
-
+        val ogTitle = title
         val plotElement = document.select(
             "h2:contains(Storyline), h3:contains(Storyline), h5:contains(Storyline), h4:contains(Storyline), h4:contains(STORYLINE)"
         ).firstOrNull() ?. nextElementSibling()
@@ -128,6 +151,15 @@ class MoviesDriveProvider : MainAPI() { // all providers must be an instance of 
         }
 
         if(tvtype == "series") {
+            if(title != ogTitle) {
+                val checkSeason = Regex("""Season\s*\d*1|S\s*\d*1""").find(ogTitle)
+                if (checkSeason == null) {
+                    val seasonText = Regex("""Season\s*\d+|S\s*\d+""").find(ogTitle)?.value
+                    if(seasonText != null) {
+                        title = title + " " + seasonText.toString()
+                    }
+                }
+            }
             val tvSeriesEpisodes = mutableListOf<Episode>()
             val episodesMap: MutableMap<Pair<Int, Int>, List<String>> = mutableMapOf()
             var buttons = document.select("h5 > a")
@@ -144,7 +176,7 @@ class MoviesDriveProvider : MainAPI() { // all providers must be an instance of 
                 val doc = app.get(episodeLink).document
                 var elements = doc.select("span:matches((?i)(Ep))")
                 if(elements.isEmpty()) {
-                    elements = doc.select("a:matches((?i)(HubCloud))")
+                    elements = doc.select("a:matches((?i)(HubCloud|GDFlix))")
                 }
                 var e = 1
 
@@ -153,7 +185,13 @@ class MoviesDriveProvider : MainAPI() { // all providers must be an instance of 
                         val titleTag = element.parent()
                         var hTag = titleTag?.nextElementSibling()
                         e = Regex("""Ep(\d{2})""").find(element.toString())?.groups?.get(1)?.value ?.toIntOrNull() ?: e
-                        while (hTag != null && hTag.text().contains("HubCloud", ignoreCase = true)) {
+                        while (
+                            hTag != null &&
+                            (
+                                    hTag.text().contains("HubCloud", ignoreCase = true) ||
+                                            hTag.text().contains("gdflix", ignoreCase = true)
+                                    )
+                        ) {
                             val aTag = hTag.selectFirst("a")
                             val epUrl = aTag?.attr("href").toString()
                             val key = Pair(realSeason, e)
@@ -251,7 +289,7 @@ class MoviesDriveProvider : MainAPI() { // all providers must be an instance of 
             val source = it.source
             loadExtractor(source, subtitleCallback, callback)
         }
-        return true   
+        return true
     }
 
     data class Meta(

@@ -54,11 +54,6 @@ class Strwishcom : StreamWishExtractor() {
     override val requiresReferer = true
 }
 
-open class Chillx : ExtractorApi() {
-    override val name = "Chillx"
-    override val mainUrl = "https://chillx.top"
-}
-
 class Beastx : Chillx() {
     override val name = "Beastx"
     override val mainUrl = "https://beastx.top"

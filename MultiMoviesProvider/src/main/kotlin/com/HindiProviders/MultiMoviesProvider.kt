@@ -1,4 +1,4 @@
-package com.HindiProviders
+package com.Phisher98
 
 //import android.util.Log
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -276,10 +276,10 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
                 when {
                     !link.contains("youtube") -> {
                         if(link.contains("gdmirrorbot.nl"))
-                            {
+                        {
                             app.get(link).document.select("ul#videoLinks li").map {
-                            @Suppress("NAME_SHADOWING") val link=it.attr("data-link")
-                            loadExtractor(link,referer = mainUrl,subtitleCallback, callback)
+                                @Suppress("NAME_SHADOWING") val link=it.attr("data-link")
+                                loadExtractor(link,referer = mainUrl,subtitleCallback, callback)
                             }
                         }
                         else
@@ -290,8 +290,8 @@ class MultiMoviesProvider : MainAPI() { // all providers must be an instance of 
                                     loadExtractor(server,referer = mainUrl,subtitleCallback, callback)
                                 }
                             }
-                        else
-                        loadExtractor(link, referer = mainUrl, subtitleCallback, callback)
+                            else
+                                loadExtractor(link, referer = mainUrl, subtitleCallback, callback)
                     }
                     else -> return@apmap
                 }
