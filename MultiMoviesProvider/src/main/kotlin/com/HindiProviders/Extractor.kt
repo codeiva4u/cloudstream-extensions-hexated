@@ -1,6 +1,7 @@
 package com.HindiProviders
 
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
+import com.lagradost.cloudstream3.extractors.Chillx
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -51,6 +52,26 @@ class Strwishcom : StreamWishExtractor() {
     override var name = "Strwish"
     override val mainUrl = "https://strwish.com"
     override val requiresReferer = true
+}
+
+class Beastx : Chillx() {
+    override val name = "Beastx"
+    override val mainUrl = "https://beastx.top"
+}
+
+class Bestx : Chillx() {
+    override val name = "Bestx"
+    override val mainUrl = "https://bestx.stream"
+}
+
+    class Boltx : Chillx() {
+    override val name = "Boltx"
+    override val mainUrl = "https://boltx.stream"
+}
+
+    class Boosterx : Chillx() {
+    override val name = "Boosterx"
+    override val mainUrl = "https://boosterx.stream"
 }
 
 open class VidhideExtractor : ExtractorApi() {
