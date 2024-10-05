@@ -75,7 +75,7 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
         return base64Decode(encodeUrl)
     }
 
-    private fun Element.toSearchResult(): SearchResponse? {
+    private fun Element.toSearchResult(): SearchResponse {
         val title = this.selectFirst("a") ?. attr("title") ?. replace("Download ", "").toString()
         val href = this.selectFirst("a") ?. attr("href").toString()
         val posterUrl = this.selectFirst("img") ?. attr("src").toString()
@@ -102,7 +102,7 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
         return searchResponse
     }
 
-    override suspend fun load(url: String): LoadResponse? {
+    override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
         var title = document.selectFirst("title")?.text()?.replace("Download ", "").toString()
         var posterUrl = document.selectFirst("meta[property=og:image]")?.attr("content").toString()
@@ -130,8 +130,8 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
 
         var cast: List<String> = emptyList()
         var genre: List<String> = emptyList()
-        var imdbRating: String = ""
-        var year: String = ""
+        var imdbRating = ""
+        var year = ""
         var background: String = posterUrl
 
         if(responseData != null) {
@@ -150,7 +150,7 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
             val episodesMap: MutableMap<Pair<Int, Int>, List<String>> = mutableMapOf()
             val buttons = document.select("a.maxbutton-download-links, a.dl")
             buttons.mapNotNull { button ->
-                val id = button.attr("href").substringAfterLast("id=").toString()
+                val id = button.attr("href").substringAfterLast("id=")
                 val seasonText = button.parent()?.previousElementSibling()?.text().toString()
                 val realSeasonRegex = Regex("""(?:Season |S)(\d+)""")
                 val realSeason = realSeasonRegex.find(seasonText)?.groupValues?.get(1)?.toIntOrNull() ?: 0
@@ -206,7 +206,7 @@ class BollyflixProvider : MainAPI() { // all providers must be an instance of Ma
         }
         else {
             val data = document.select("a.dl").amap {
-                val id = it.attr("href").substringAfterLast("id=").toString()
+                val id = it.attr("href").substringAfterLast("id=")
                 val decodeUrl = bypass(id)
                 val source = app.get(decodeUrl, allowRedirects = false).headers["location"].toString()
                 EpisodeLink(
